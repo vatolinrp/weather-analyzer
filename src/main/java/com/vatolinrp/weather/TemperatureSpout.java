@@ -12,6 +12,7 @@ import com.vatolinrp.weather.model.WeatherElement;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class TemperatureSpout extends BaseRichSpout {
@@ -19,7 +20,7 @@ public class TemperatureSpout extends BaseRichSpout {
   public static final String ID = "temperature-reader";
   private SpoutOutputCollector spoutOutputCollector;
   private static final String URL = "http://apidev.accuweather.com/currentconditions/v1/28580.json?language=en&apikey=hoArfRosT1215";
-  private static final Long HOUR = 3600000L;
+  private static final Long MINUTE = 60000L;
 
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
     spoutOutputCollector = collector;
@@ -29,15 +30,17 @@ public class TemperatureSpout extends BaseRichSpout {
     RestTemplate restTemplate = new RestTemplate();
     String response = restTemplate.getForObject( URL, String.class );
     ObjectMapper objectMapper = new ObjectMapper();
-    String temperature = "";
-    try {
-      WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class )[0];
-      temperature = weatherElement.getTemperature().getMetric().getValue() + weatherElement.getTemperature().getMetric().getUnit();
-    } catch (IOException e) {
-      e.printStackTrace();
+    Double temperature = .0;
+    if( LocalDateTime.now().getMinute() == 0 ) {
+      try {
+        WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class )[0];
+        temperature = weatherElement.getTemperature().getMetric().getValue();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      spoutOutputCollector.emit( new Values( temperature ) );
+      Utils.sleep( MINUTE );
     }
-    spoutOutputCollector.emit( new Values( temperature ) );
-    Utils.sleep( HOUR );
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
