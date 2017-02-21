@@ -34,7 +34,8 @@ public class MailSenderBolt extends BaseRichBolt {
   }
 
   public void execute(Tuple input) {
-    Double temperatureReceived = (Double)input.getValueByField( "temperature" );
+    Double current = (Double)input.getValueByField( "current" );
+    Double inAnHour = (Double)input.getValueByField( "inAnHour" );
     Properties properties = new Properties();
     properties.put("mail.smtp.host", "smtp.mail.ru" );
     properties.put("mail.smtp.auth", "true" );
@@ -50,44 +51,40 @@ public class MailSenderBolt extends BaseRichBolt {
 
     try {
       MimeMessage message = new MimeMessage(session);
-
       message.setFrom(new InternetAddress("vatolinrp@mail.ru"));
-
       message.addRecipient(Message.RecipientType.TO, new InternetAddress("vatolinrp@icloud.com"));
       message.setSubject( "Weather in Minsk" );
-      message.setText("Temperature in Minsk is: " + temperatureReceived + "C" );
+      message.setText("Temperature in Minsk is: " + current + "F" + "\nTemperature in Minsk in an hour will be: " + inAnHour + "F" );
       Transport.send(message);
 
-      if( LocalDateTime.now().getHour() == 9 ) {
-        message = new MimeMessage(session);
-        message.setFrom(new InternetAddress("vatolinrp@mail.ru"));
-        message.addRecipient( Message.RecipientType.TO, new InternetAddress("vatolinrp@icloud.com"));
-        message.addRecipient( Message.RecipientType.TO, new InternetAddress("mire-natasha@yandex.ru"));
-        message.addRecipient( Message.RecipientType.TO, new InternetAddress("russan2005@yandex.ru"));
-        message.setSubject( "Weather in Minsk" );
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append( "Temperature in Minsk is: " + temperatureReceived + "C" );
-        stringBuffer.append( "\n" );
-        if (temperatureReceived < MITTENS_REQUIRED) {
-          stringBuffer.append( "Put on mittens, please." );
-          stringBuffer.append( "\n" );
-        }
-        if (temperatureReceived < FUR_COAT_REQUIRED) {
-
-          stringBuffer.append( "Put on fur coat, please." );
-          stringBuffer.append( "\n" );
-        }
-        message.setText(stringBuffer.toString());
-        Transport.send(message);
-        isLocked = true;
-      }
-      if( LocalDateTime.now().getHour() != 9 ) {
-        isLocked = false;
-      }
+//      if( LocalDateTime.now().getHour() == 9 ) {
+//        message = new MimeMessage(session);
+//        message.setFrom(new InternetAddress("vatolinrp@mail.ru"));
+//        message.addRecipient( Message.RecipientType.TO, new InternetAddress("vatolinrp@icloud.com"));
+//        message.setSubject( "Weather in Minsk" );
+//        StringBuffer stringBuffer = new StringBuffer();
+//        stringBuffer.append( "Temperature in Minsk is: " + temperatureReceived + "C" );
+//        stringBuffer.append( "\n" );
+//        if (temperatureReceived < MITTENS_REQUIRED) {
+//          stringBuffer.append( "Put on mittens, please." );
+//          stringBuffer.append( "\n" );
+//        }
+//        if (temperatureReceived < FUR_COAT_REQUIRED) {
+//
+//          stringBuffer.append( "Put on fur coat, please." );
+//          stringBuffer.append( "\n" );
+//        }
+//        message.setText(stringBuffer.toString());
+//        Transport.send(message);
+//        isLocked = true;
+//      }
+//      if( LocalDateTime.now().getHour() != 9 ) {
+//        isLocked = false;
+//      }
     } catch (MessagingException mex) {
       mex.printStackTrace();
     }
-    logger.info( "temperature received : " +  temperatureReceived );
+//    logger.info( "temperature received : " +  temperatureReceived );
   }
 
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
