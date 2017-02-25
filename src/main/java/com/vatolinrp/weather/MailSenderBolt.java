@@ -64,6 +64,9 @@ public class MailSenderBolt extends BaseRichBolt {
       buffer.append( "Forecast told us: " );
       buffer.append( forecastCondition.getTemperature() );
       buffer.append( "F\n");
+      buffer.append( "Data provided by: " );
+      buffer.append( forecastCondition.getApiType() );
+      buffer.append( "F\n");
       if( currentCondition.getTemperature().equals(forecastCondition.getTemperature() ) ) {
         buffer.append( "Forecast was accurate for temperature prediction " );
       } else {
