@@ -25,7 +25,7 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
   private static ObjectMapper objectMapper;
   private static final String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   private static final String TRANSFER_VALUE = "weatherConditionTO";
-  private static final Long MINUTE = 60000L;
+  private static final Long TEN_MINUTES = 600000L;
   private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
   private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
   private static final String HOUR_FORECAST_URL = "http://" + ACCUWEATHER_HOST + "/forecasts/v1/hourly/1hour/%s?apikey=%s";
@@ -58,6 +58,6 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
       } catch (IOException e) {
         e.printStackTrace();
       }
-      Utils.sleep( MINUTE );
+      Utils.sleep( TEN_MINUTES );
   }
 }

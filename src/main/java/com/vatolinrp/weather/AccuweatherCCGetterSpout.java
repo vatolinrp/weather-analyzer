@@ -28,7 +28,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout {
   private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
   private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
   private static final String TRANSFER_VALUE = "weatherConditionTO";
-  private static final Long MINUTE = 60000L;
+  private static final Long TEN_MINUTES = 600000L;
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;
@@ -61,6 +61,6 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout {
       } catch (IOException e) {
         e.printStackTrace();
       }
-      Utils.sleep( MINUTE );
+      Utils.sleep( TEN_MINUTES );
     }
 }
