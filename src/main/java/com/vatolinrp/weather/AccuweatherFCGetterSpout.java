@@ -8,7 +8,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vatolinrp.weather.model.HourForecast;
+import com.vatolinrp.weather.model.accuweather.HourForecast;
 import com.vatolinrp.weather.model.WeatherConditionTO;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,12 +19,12 @@ import java.util.logging.Logger;
 
 public class AccuweatherFCGetterSpout extends BaseRichSpout {
   private static final Logger logger = Logger.getLogger( AccuweatherFCGetterSpout.class.getName() );
-  public static final String ID = "forecast-condition-getter";
+  public static final String ID = "forecast-accuweather-cond";
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;
   private static final String ACCUWEATHER_HOST = "dataservice.accuweather.com";
-  private static final String TRANSFER_VALUE = "weatherConditionTO";
+  private static final String TRANSFER_VALUE = "weatherConditionTO-AW";
   private static final Long TEN_MINUTES = 600000L;
   private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
   private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
@@ -51,10 +51,11 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
         weatherConditionTO.setLocationKey( MINSK_CANNONICAL_LOCATION_KEY );
         ZonedDateTime date = ZonedDateTime.parse( weatherElement.getDateTime() );
         weatherConditionTO.setTargetDate( date );
-        String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour();
+        weatherConditionTO.setApiType( "AW" );
+        String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour() + "&AW";
         weatherConditionTO.setTransferKey( key );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
-        logger.info( String.format( "forecast condition sent further with value: %s", weatherConditionTO.toString() ) );
+        logger.info( String.format( "forecast condition from accuweather sent further with value: %s", weatherConditionTO.toString() ) );
       } catch (IOException e) {
         e.printStackTrace();
       }

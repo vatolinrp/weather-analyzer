@@ -9,7 +9,7 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vatolinrp.weather.model.WeatherConditionTO;
-import com.vatolinrp.weather.model.WeatherElement;
+import com.vatolinrp.weather.model.accuweather.WeatherElement;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -21,13 +21,13 @@ import java.util.logging.Logger;
  * Accuweather current condition getter spout
  */
 public class AccuweatherCCGetterSpout extends BaseRichSpout {
-  public static final String ID = "current-condition-getter";
+  public static final String ID = "current-accuweather-cond";
   private static final Logger logger = Logger.getLogger( AccuweatherCCGetterSpout.class.getName() );
   private static final String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   private static final String URL = "http://" + ACCUWEATHER_HOST + "/currentconditions/v1/%s?apikey=%s";
   private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
   private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
-  private static final String TRANSFER_VALUE = "weatherConditionTO";
+  private static final String TRANSFER_VALUE = "weatherConditionTO-AW";
   private static final Long TEN_MINUTES = 600000L;
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
@@ -43,24 +43,25 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout {
   }
 
   public void nextTuple() {
-      try {
-        String response = restTemplate.getForObject( String.format( URL,
-          MINSK_CANNONICAL_LOCATION_KEY, PERSONAL_API_KEY ), String.class );
-        WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class )[0];
-        WeatherConditionTO weatherConditionTO;
-        weatherConditionTO = new WeatherConditionTO();
-        weatherConditionTO.setTemperature( weatherElement.getTemperature().getImperial().getValue() );
-        weatherConditionTO.setLocationKey( MINSK_CANNONICAL_LOCATION_KEY );
-        ZonedDateTime date = ZonedDateTime.parse( weatherElement.getLocalObservationDateTime() );
-        weatherConditionTO.setTargetDate( date );
-        String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour();
-        weatherConditionTO.setTransferKey( key );
-        spoutOutputCollector.emit( new Values( weatherConditionTO ) );
-        logger.info( String.format( "current condition sent further with value: %s",
-          weatherConditionTO.toString() ) );
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      Utils.sleep( TEN_MINUTES );
+    try {
+      String response = restTemplate.getForObject( String.format( URL,
+        MINSK_CANNONICAL_LOCATION_KEY, PERSONAL_API_KEY ), String.class );
+      WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class )[0];
+      WeatherConditionTO weatherConditionTO;
+      weatherConditionTO = new WeatherConditionTO();
+      weatherConditionTO.setTemperature( weatherElement.getTemperature().getImperial().getValue() );
+      weatherConditionTO.setLocationKey( MINSK_CANNONICAL_LOCATION_KEY );
+      ZonedDateTime date = ZonedDateTime.parse( weatherElement.getLocalObservationDateTime() );
+      weatherConditionTO.setTargetDate( date );
+      weatherConditionTO.setApiType( "AW" );
+      String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour() + "&AW";
+      weatherConditionTO.setTransferKey( key );
+      spoutOutputCollector.emit( new Values( weatherConditionTO ) );
+      logger.info( String.format( "current condition from accuweather sent further with value: %s",
+        weatherConditionTO.toString() ) );
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+    Utils.sleep( TEN_MINUTES );
+  }
 }
