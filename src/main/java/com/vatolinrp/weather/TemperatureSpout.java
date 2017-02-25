@@ -8,10 +8,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vatolinrp.weather.model.Details;
-import com.vatolinrp.weather.model.HourForecast;
-import com.vatolinrp.weather.model.Neighbour;
-import com.vatolinrp.weather.model.WeatherElement;
+import com.vatolinrp.weather.model.accuweather.Details;
+import com.vatolinrp.weather.model.accuweather.HourForecast;
+import com.vatolinrp.weather.model.accuweather.Neighbour;
+import com.vatolinrp.weather.model.accuweather.WeatherElement;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
