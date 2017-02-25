@@ -9,4 +9,5 @@ public @Data class WeatherConditionTO implements Serializable {
   private Double temperature;
   private ZonedDateTime targetDate;
   private String transferKey;
+  private String apiType;
 }
