@@ -29,7 +29,16 @@ public class CacheExtractorBolt extends BaseRichBolt {
 
   @Override
   public void execute( Tuple tuple ) {
-    WeatherConditionTO currentWeatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO" );
+    WeatherConditionTO currentWeatherConditionTO = null;
+    if( tuple.contains( "weatherConditionTO-AW" ) ) {
+      currentWeatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO-AW" );
+    }
+    if( tuple.contains( "weatherConditionTO-DS" ) ) {
+      currentWeatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO-DS" );
+    }
+    if( currentWeatherConditionTO == null ) {
+      return;
+    }
     final String transferKey = currentWeatherConditionTO.getTransferKey();
     logger.info( String.format( "received a tuple with transfer key: %s", transferKey ) );
     Cache cache = cacheManager.getCache( "hourForecast" );

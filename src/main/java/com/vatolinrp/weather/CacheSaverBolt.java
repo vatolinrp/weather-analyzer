@@ -26,7 +26,16 @@ public class CacheSaverBolt extends BaseRichBolt {
 
   @Override
   public void execute( Tuple tuple ) {
-    WeatherConditionTO weatherConditionTO = (WeatherConditionTO)tuple.getValueByField("weatherConditionTO" );
+    WeatherConditionTO weatherConditionTO = null;
+    if( tuple.contains( "weatherConditionTO-AW" ) ) {
+      weatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO-AW" );
+    }
+    if( tuple.contains( "weatherConditionTO-DS" ) ) {
+      weatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO-DS" );
+    }
+    if( weatherConditionTO == null ) {
+      return;
+    }
     Cache cache = cacheManager.getCache( "hourForecast" );
     cache.put( new Element( weatherConditionTO.getTransferKey(), weatherConditionTO ) );
     logger.info( String.format( "cache populated with key : %s and value: %s",
