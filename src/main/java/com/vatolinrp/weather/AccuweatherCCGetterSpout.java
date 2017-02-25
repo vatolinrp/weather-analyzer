@@ -28,7 +28,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout {
   private static final String URL = "http://" + ACCUWEATHER_HOST + "/currentconditions/v1/%s?apikey=%s";
   private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
   private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
-  private static final String TRANSFER_VALUE = "weatherConditionTransferObject";
+  private static final String TRANSFER_VALUE = "weatherConditionTO";
   private static final Long MINUTE = 60000L;
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;

@@ -25,7 +25,7 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;
   private static final String ACCUWEATHER_HOST = "dataservice.accuweather.com";
-  private static final String TRANSFER_VALUE = "weatherConditionTransferObject";
+  private static final String TRANSFER_VALUE = "weatherConditionTO";
   private static final Long MINUTE = 60000L;
   private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
   private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
