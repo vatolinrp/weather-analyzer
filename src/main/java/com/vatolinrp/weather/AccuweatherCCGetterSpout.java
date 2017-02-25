@@ -56,6 +56,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout {
         ZonedDateTime date = ZonedDateTime.parse( weatherElement.getLocalObservationDateTime() );
         weatherConditionTO.setTargetDate( date );
         String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour();
+        weatherConditionTO.setTransferKey( key );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
         logger.info( String.format( "current condition sent further with value: %s",
           weatherConditionTO.toString() ) );
