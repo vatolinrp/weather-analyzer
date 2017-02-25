@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,52 +9,41 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.vatolinrp.weather.model.accuweather.Direction;
+import com.vatolinrp.weather.model.accuweather.Speed;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "Value",
-    "Unit",
-    "UnitType"
+    "Speed",
+    "Direction"
 })
-public class Rain {
+public class Wind {
 
-    @JsonProperty("Value")
-    private Integer value;
-    @JsonProperty("Unit")
-    private String unit;
-    @JsonProperty("UnitType")
-    private Integer unitType;
+    @JsonProperty("Speed")
+    private Speed speed;
+    @JsonProperty("Direction")
+    private Direction direction;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("Value")
-    public Integer getValue() {
-        return value;
+    @JsonProperty("Speed")
+    public Speed getSpeed() {
+        return speed;
     }
 
-    @JsonProperty("Value")
-    public void setValue(Integer value) {
-        this.value = value;
+    @JsonProperty("Speed")
+    public void setSpeed(Speed speed) {
+        this.speed = speed;
     }
 
-    @JsonProperty("Unit")
-    public String getUnit() {
-        return unit;
+    @JsonProperty("Direction")
+    public Direction getDirection() {
+        return direction;
     }
 
-    @JsonProperty("Unit")
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    @JsonProperty("UnitType")
-    public Integer getUnitType() {
-        return unitType;
-    }
-
-    @JsonProperty("UnitType")
-    public void setUnitType(Integer unitType) {
-        this.unitType = unitType;
+    @JsonProperty("Direction")
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     @JsonAnyGetter

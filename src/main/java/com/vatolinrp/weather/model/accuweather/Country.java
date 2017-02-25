@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "LocalizedName",
     "EnglishName"
 })
-public class Region {
+public class Country {
 
     @JsonProperty("ID")
     private String iD;

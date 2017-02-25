@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.Map;

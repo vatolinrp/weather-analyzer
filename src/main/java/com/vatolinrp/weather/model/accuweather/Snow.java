@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,36 +12,49 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "Speed",
-    "Direction"
+    "Value",
+    "Unit",
+    "UnitType"
 })
-public class Wind {
+public class Snow {
 
-    @JsonProperty("Speed")
-    private Speed speed;
-    @JsonProperty("Direction")
-    private Direction direction;
+    @JsonProperty("Value")
+    private Integer value;
+    @JsonProperty("Unit")
+    private String unit;
+    @JsonProperty("UnitType")
+    private Integer unitType;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("Speed")
-    public Speed getSpeed() {
-        return speed;
+    @JsonProperty("Value")
+    public Integer getValue() {
+        return value;
     }
 
-    @JsonProperty("Speed")
-    public void setSpeed(Speed speed) {
-        this.speed = speed;
+    @JsonProperty("Value")
+    public void setValue(Integer value) {
+        this.value = value;
     }
 
-    @JsonProperty("Direction")
-    public Direction getDirection() {
-        return direction;
+    @JsonProperty("Unit")
+    public String getUnit() {
+        return unit;
     }
 
-    @JsonProperty("Direction")
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    @JsonProperty("Unit")
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    @JsonProperty("UnitType")
+    public Integer getUnitType() {
+        return unitType;
+    }
+
+    @JsonProperty("UnitType")
+    public void setUnitType(Integer unitType) {
+        this.unitType = unitType;
     }
 
     @JsonAnyGetter

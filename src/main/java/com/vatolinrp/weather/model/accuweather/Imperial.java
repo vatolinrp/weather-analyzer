@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;

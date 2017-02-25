@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +10,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.vatolinrp.weather.model.accuweather.AdministrativeArea;
+import com.vatolinrp.weather.model.accuweather.Country;
+import com.vatolinrp.weather.model.accuweather.Details;
+import com.vatolinrp.weather.model.accuweather.GeoPosition;
+import com.vatolinrp.weather.model.accuweather.Region;
+import com.vatolinrp.weather.model.accuweather.TimeZone;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({

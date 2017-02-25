@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "Unit",
     "UnitType"
 })
-public class RealFeelTemperature {
+public class ForecastTemperature {
 
     @JsonProperty("Value")
     private Integer value;

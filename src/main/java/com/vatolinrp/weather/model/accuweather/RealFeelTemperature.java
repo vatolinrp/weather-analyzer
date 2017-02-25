@@ -1,5 +1,5 @@
 
-package com.vatolinrp.weather.model;
+package com.vatolinrp.weather.model.accuweather;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,49 +12,49 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "DataType",
-    "Source",
-    "SourceId"
+    "Value",
+    "Unit",
+    "UnitType"
 })
-public class Source {
+public class RealFeelTemperature {
 
-    @JsonProperty("DataType")
-    private String dataType;
-    @JsonProperty("Source")
-    private String source;
-    @JsonProperty("SourceId")
-    private Integer sourceId;
+    @JsonProperty("Value")
+    private Integer value;
+    @JsonProperty("Unit")
+    private String unit;
+    @JsonProperty("UnitType")
+    private Integer unitType;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("DataType")
-    public String getDataType() {
-        return dataType;
+    @JsonProperty("Value")
+    public Integer getValue() {
+        return value;
     }
 
-    @JsonProperty("DataType")
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    @JsonProperty("Value")
+    public void setValue(Integer value) {
+        this.value = value;
     }
 
-    @JsonProperty("Source")
-    public String getSource() {
-        return source;
+    @JsonProperty("Unit")
+    public String getUnit() {
+        return unit;
     }
 
-    @JsonProperty("Source")
-    public void setSource(String source) {
-        this.source = source;
+    @JsonProperty("Unit")
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
-    @JsonProperty("SourceId")
-    public Integer getSourceId() {
-        return sourceId;
+    @JsonProperty("UnitType")
+    public Integer getUnitType() {
+        return unitType;
     }
 
-    @JsonProperty("SourceId")
-    public void setSourceId(Integer sourceId) {
-        this.sourceId = sourceId;
+    @JsonProperty("UnitType")
+    public void setUnitType(Integer unitType) {
+        this.unitType = unitType;
     }
 
     @JsonAnyGetter
