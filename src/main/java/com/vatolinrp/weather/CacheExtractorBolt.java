@@ -29,22 +29,24 @@ public class CacheExtractorBolt extends BaseRichBolt {
 
   @Override
   public void execute( Tuple tuple ) {
-    WeatherConditionTO weatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO" );
-    logger.info( String.format( "received a tuple with transfer key: %s",weatherConditionTO.getTransferKey() ) );
+    WeatherConditionTO currentWeatherConditionTO = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO" );
+    final String transferKey = currentWeatherConditionTO.getTransferKey();
+    logger.info( String.format( "received a tuple with transfer key: %s", transferKey ) );
     Cache cache = cacheManager.getCache( "hourForecast" );
-    if( cache.isKeyInCache( weatherConditionTO.getTransferKey() ) ) {
-      boltOutputCollector.emit( new Values( weatherConditionTO.getTransferKey(), weatherConditionTO ) );
-      Element element = cache.get( weatherConditionTO.getTransferKey() );
+    if( cache.isKeyInCache( transferKey ) ) {
+      Element element = cache.get( transferKey );
       if( element != null ) {
-        weatherConditionTO = ( WeatherConditionTO )element.getObjectValue();
-        logger.info( String.format( "got from cache value : %s", weatherConditionTO.toString() ) );
-        boltOutputCollector.emit( new Values( weatherConditionTO.getTransferKey(), weatherConditionTO ) );
+        WeatherConditionTO forecastWeatherConditionTO = ( WeatherConditionTO )element.getObjectValue();
+        logger.info( String.format( "got from cache value : %s", forecastWeatherConditionTO.toString() ) );
+        boltOutputCollector.emit( new Values( forecastWeatherConditionTO, currentWeatherConditionTO ) );
       }
+    } else {
+      logger.info( String.format( "no data found in cache for transaction key:%s", transferKey ) );
     }
   }
 
   @Override
   public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-    outputFieldsDeclarer.declare( new Fields("transferKey", "weatherConditionTO" ) );
+    outputFieldsDeclarer.declare( new Fields("forecastCondition", "currentCondition" ) );
   }
 }
