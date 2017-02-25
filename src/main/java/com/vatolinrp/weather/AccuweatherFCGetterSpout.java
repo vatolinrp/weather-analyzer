@@ -13,7 +13,6 @@ import com.vatolinrp.weather.model.WeatherConditionTO;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -42,7 +41,6 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
   }
 
   public void nextTuple() {
-    if( LocalDateTime.now().getMinute() == 0 ) {
       try {
         String response = restTemplate.getForObject( String.format( HOUR_FORECAST_URL,
           MINSK_CANNONICAL_LOCATION_KEY, PERSONAL_API_KEY ), String.class );
@@ -61,6 +59,5 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
         e.printStackTrace();
       }
       Utils.sleep( MINUTE );
-    }
   }
 }
