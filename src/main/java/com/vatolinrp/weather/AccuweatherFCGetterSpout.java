@@ -56,7 +56,7 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
         String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour();
         weatherConditionTO.setTransferKey( key );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
-        logger.info( String.format( "current condition sent further with value: %s", weatherConditionTO.toString() ) );
+        logger.info( String.format( "forecast condition sent further with value: %s", weatherConditionTO.toString() ) );
       } catch (IOException e) {
         e.printStackTrace();
       }
