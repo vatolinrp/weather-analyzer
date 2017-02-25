@@ -5,6 +5,7 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+import com.vatolinrp.weather.model.WeatherConditionTO;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -26,22 +27,24 @@ public class MailSenderBolt extends BaseRichBolt {
   private static final Double MITTENS_REQUIRED = 15.;
   private static final Double FUR_COAT_REQUIRED = .0;
   private static boolean isLocked = false;
+  private Properties mailProperties;
 
   private OutputCollector outputCollector;
 
   public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
     outputCollector = collector;
+    mailProperties = new Properties();
+    mailProperties.put( "mail.smtp.host", "smtp.mail.ru" );
+    mailProperties.put( "mail.smtp.auth", "true" );
+    mailProperties.put( "mail.smtp.port", "587" );
+    mailProperties.put( "mail.smtp.starttls.enable", "true" );
   }
 
   public void execute(Tuple input) {
-    Double current = (Double)input.getValueByField( "current" );
-    Double inAnHour = (Double)input.getValueByField( "inAnHour" );
-    Properties properties = new Properties();
-    properties.put("mail.smtp.host", "smtp.mail.ru" );
-    properties.put("mail.smtp.auth", "true" );
-    properties.put("mail.smtp.port", "587" );
-    properties.put("mail.smtp.starttls.enable", "true");
-    Session session = Session.getInstance(properties,
+    WeatherConditionTO currentCondition = (WeatherConditionTO)input.getValueByField( "currentCondition" );
+    WeatherConditionTO forecastCondition = (WeatherConditionTO)input.getValueByField( "forecastCondition" );
+
+    Session session = Session.getInstance(mailProperties,
       new Authenticator() {
         protected PasswordAuthentication getPasswordAuthentication() {
           return new PasswordAuthentication("vatolinrp@mail.ru", System.getenv("MAIL_PASSWORD" ) );
@@ -52,42 +55,28 @@ public class MailSenderBolt extends BaseRichBolt {
     try {
       MimeMessage message = new MimeMessage(session);
       message.setFrom(new InternetAddress("vatolinrp@mail.ru"));
-      message.addRecipient(Message.RecipientType.TO, new InternetAddress("vatolinrp@icloud.com"));
+      message.addRecipient( Message.RecipientType.TO, new InternetAddress("vatolinrp@icloud.com" ) );
       message.setSubject( "Weather in Minsk" );
-      message.setText("Temperature in Minsk is: " + current + "F" + "\nTemperature in Minsk in an hour will be: " + inAnHour + "F" );
-      Transport.send(message);
-
-//      if( LocalDateTime.now().getHour() == 9 ) {
-//        message = new MimeMessage(session);
-//        message.setFrom(new InternetAddress("vatolinrp@mail.ru"));
-//        message.addRecipient( Message.RecipientType.TO, new InternetAddress("vatolinrp@icloud.com"));
-//        message.setSubject( "Weather in Minsk" );
-//        StringBuffer stringBuffer = new StringBuffer();
-//        stringBuffer.append( "Temperature in Minsk is: " + temperatureReceived + "C" );
-//        stringBuffer.append( "\n" );
-//        if (temperatureReceived < MITTENS_REQUIRED) {
-//          stringBuffer.append( "Put on mittens, please." );
-//          stringBuffer.append( "\n" );
-//        }
-//        if (temperatureReceived < FUR_COAT_REQUIRED) {
-//
-//          stringBuffer.append( "Put on fur coat, please." );
-//          stringBuffer.append( "\n" );
-//        }
-//        message.setText(stringBuffer.toString());
-//        Transport.send(message);
-//        isLocked = true;
-//      }
-//      if( LocalDateTime.now().getHour() != 9 ) {
-//        isLocked = false;
-//      }
+      StringBuffer buffer = new StringBuffer();
+      buffer.append( "Temperature in Minsk is: " );
+      buffer.append( currentCondition.getTemperature() );
+      buffer.append( "F\n");
+      buffer.append( "Forecast told us: " );
+      buffer.append( forecastCondition.getTemperature() );
+      buffer.append( "F\n");
+      if( currentCondition.getTemperature().equals(forecastCondition.getTemperature() ) ) {
+        buffer.append( "Forecast was accurate for temperature prediction " );
+      } else {
+        buffer.append( "Forecast was not accurate for temperature prediction." );
+        buffer.append( "It was reported. Will use better weather sources later on." );
+      }
+      message.setText( buffer.toString() );
+      Transport.send( message );
+      logger.info( "Successfully sent report message" );
     } catch (MessagingException mex) {
       mex.printStackTrace();
     }
-//    logger.info( "temperature received : " +  temperatureReceived );
   }
 
-  public void declareOutputFields(OutputFieldsDeclarer declarer) {
-
-  }
+  public void declareOutputFields( OutputFieldsDeclarer declarer ) {}
 }
