@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 public class AccuweatherFCGetterSpout extends BaseRichSpout {
   private static final Logger logger = Logger.getLogger( AccuweatherFCGetterSpout.class.getName() );
+  public static final String ID = "forecast-condition-getter";
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;

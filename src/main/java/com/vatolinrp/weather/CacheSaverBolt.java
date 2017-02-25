@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class CacheSaverBolt extends BaseRichBolt {
+  public static final String ID = "cache-saver";
   private CacheManager cacheManager;
   private static final Logger logger = Logger.getLogger( CacheSaverBolt.class.getName() );
 

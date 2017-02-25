@@ -22,6 +22,7 @@ import java.util.logging.Logger;
  * Accuweather current condition getter spout
  */
 public class AccuweatherCCGetterSpout extends BaseRichSpout {
+  public static final String ID = "current-condition-getter";
   private static final Logger logger = Logger.getLogger( AccuweatherCCGetterSpout.class.getName() );
   private static final String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   private static final String URL = "http://" + ACCUWEATHER_HOST + "/currentconditions/v1/%s?apikey=%s";
