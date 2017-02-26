@@ -25,11 +25,13 @@ public class Topology {
     MailSenderBolt mailSenderBolt = new MailSenderBolt();
     CacheExtractorBolt cacheExtractorBolt = new CacheExtractorBolt();
     CacheSaverBolt cacheSaverBolt = new CacheSaverBolt();
+    DataCollectorBolt dataCollectorBolt = new DataCollectorBolt();
     topologyBuilder.setBolt( CacheSaverBolt.ID, cacheSaverBolt )
       .shuffleGrouping( AccuweatherFCGetterSpout.ID ).shuffleGrouping( DarkSkyFCGetterSpout.ID );
     topologyBuilder.setBolt( CacheExtractorBolt.ID, cacheExtractorBolt )
       .shuffleGrouping( AccuweatherCCGetterSpout.ID ).shuffleGrouping( DarkSkyCCGetterSpout.ID );
-    topologyBuilder.setBolt( MailSenderBolt.ID, mailSenderBolt ).shuffleGrouping( CacheExtractorBolt.ID );
+    topologyBuilder.setBolt( DataCollectorBolt.ID, dataCollectorBolt ).shuffleGrouping( CacheExtractorBolt.ID );
+    topologyBuilder.setBolt( MailSenderBolt.ID, mailSenderBolt );
     StormTopology stormTopology = topologyBuilder.createTopology();
     LocalCluster localCluster = new LocalCluster();
     localCluster.submitTopology( TOPOLOGY_NAME, config, stormTopology );
