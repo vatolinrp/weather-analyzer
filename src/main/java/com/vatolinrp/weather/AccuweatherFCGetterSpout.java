@@ -10,6 +10,8 @@ import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vatolinrp.weather.model.accuweather.HourForecast;
 import com.vatolinrp.weather.model.WeatherConditionTO;
+import com.vatolinrp.weather.model.accuweather.WeatherElement;
+import com.vatolinrp.weather.util.StormConstants;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -17,18 +19,13 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class AccuweatherFCGetterSpout extends BaseRichSpout {
+public class AccuweatherFCGetterSpout extends BaseRichSpout implements StormConstants {
   private static final Logger logger = Logger.getLogger( AccuweatherFCGetterSpout.class.getName() );
   public static final String ID = "forecast-accuweather-cond";
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;
-  private static final String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   private static final String TRANSFER_VALUE = "weatherConditionTO-AW";
-  private static final Long TEN_MINUTES = 600000L;
-  private static final String MINSK_CANNONICAL_LOCATION_KEY = "28580";
-  private static final String PERSONAL_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
-  private static final String HOUR_FORECAST_URL = "http://" + ACCUWEATHER_HOST + "/forecasts/v1/hourly/1hour/%s?apikey=%s";
 
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
     spoutOutputCollector = collector;
@@ -36,29 +33,41 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout {
     objectMapper = new ObjectMapper();
   }
 
-  public void declareOutputFields(OutputFieldsDeclarer declarer) {
+  public void declareOutputFields( OutputFieldsDeclarer declarer ) {
     declarer.declare( new Fields( TRANSFER_VALUE ) );
   }
 
   public void nextTuple() {
+    for( CitiesEnum city : CitiesEnum.values() ) {
       try {
-        String response = restTemplate.getForObject( String.format( HOUR_FORECAST_URL,
-          MINSK_CANNONICAL_LOCATION_KEY, PERSONAL_API_KEY ), String.class );
-        HourForecast weatherElement = objectMapper.readValue( response, HourForecast[].class )[0];
-        WeatherConditionTO weatherConditionTO;
-        weatherConditionTO = new WeatherConditionTO();
-        weatherConditionTO.setTemperature( weatherElement.getTemperature().getValue().doubleValue() );
-        weatherConditionTO.setLocationKey( MINSK_CANNONICAL_LOCATION_KEY );
-        ZonedDateTime date = ZonedDateTime.parse( weatherElement.getDateTime() );
-        weatherConditionTO.setTargetDate( date );
-        weatherConditionTO.setApiType( "AW" );
-        String key = MINSK_CANNONICAL_LOCATION_KEY + "&" + date.getDayOfMonth() + "&" + date.getHour() + "&AW";
-        weatherConditionTO.setTransferKey( key );
+        String url = createURL( city );
+        String response = restTemplate.getForObject( url, String.class );
+        HourForecast hourForecast = objectMapper.readValue(response, HourForecast[].class)[0];
+        WeatherConditionTO weatherConditionTO = creareTO( hourForecast, city );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
-        logger.info( String.format( "forecast condition from accuweather sent further with value: %s", weatherConditionTO.toString() ) );
+        logger.info( String.format( "forecast condition from accuweather sent further with value: %s",
+          weatherConditionTO.toString()));
       } catch (IOException e) {
         e.printStackTrace();
       }
-      Utils.sleep( TEN_MINUTES );
+    }
+    Utils.sleep( SLEEP_TIME );
+  }
+
+  private String createURL( CitiesEnum citiesEnum ) {
+    return String.format( "http://" + ACCUWEATHER_HOST + "/forecasts/v1/hourly/1hour/%s?apikey=%s",
+        citiesEnum.getCityId(), ACCCUWEATHER_API_KEY );
+  }
+
+  private WeatherConditionTO creareTO(HourForecast hourForecast, CitiesEnum city ) {
+    WeatherConditionTO weatherConditionTO = new WeatherConditionTO();
+    weatherConditionTO.setTemperature( hourForecast.getTemperature().getValue().doubleValue() );
+    weatherConditionTO.setLocationKey( city.getCityId() );
+    ZonedDateTime date = ZonedDateTime.parse( hourForecast.getDateTime() );
+    weatherConditionTO.setTargetDate( date );
+    weatherConditionTO.setApiType( ACCUWEATHER_API_TYPE );
+    String key = city.getCityId() + "&" + date.getDayOfMonth() + "&" + date.getHour() + "&" + ACCUWEATHER_API_TYPE;
+    weatherConditionTO.setTransferKey(key);
+    return weatherConditionTO;
   }
 }
