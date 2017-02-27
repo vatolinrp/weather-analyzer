@@ -43,6 +43,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
     for( CitiesEnum city : CitiesEnum.values() ) {
       try {
         String url = createURL( city );
+        logger.info("requesting data using this url: " + url );
         String response = restTemplate.getForObject( url, String.class );
         WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class)[0];
         WeatherConditionTO weatherConditionTO = creareTO( weatherElement, city );

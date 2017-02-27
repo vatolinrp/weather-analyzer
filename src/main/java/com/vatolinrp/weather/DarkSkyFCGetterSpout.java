@@ -44,8 +44,9 @@ public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstant
     for( CitiesEnum city: CitiesEnum.values() ) {
       try {
         String time = Long.toString( ZonedDateTime.now( ZoneId.of( city.getTimeZone() ) ).toEpochSecond() );
-        String url = createURL( city );
-        String response = restTemplate.getForObject( String.format( url, time ), String.class );
+        String url = createURL( city, time );
+        logger.info("requesting data using this url: " + url );
+        String response = restTemplate.getForObject( url, String.class );
         DarkSkyResponse weatherElement = objectMapper.readValue( response, DarkSkyResponse.class );
         HourlyDatum oneHourForecast = null;
         for (HourlyDatum hourlyDatum : weatherElement.getHourly().getData()) {
@@ -93,8 +94,8 @@ public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstant
     return localDateTime.atZone( ZoneId.of( timeZone ) );
   }
 
-  private String createURL( CitiesEnum citiesEnum ) {
+  private String createURL( CitiesEnum citiesEnum, String time ) {
     return "https://" + DARK_SKY_HOST + "/forecast/" + DARK_SKY_API_KEY + "/"+citiesEnum.getLatitude()+","
-        + citiesEnum.getLongitude() +",%s?exclude=daily,currently,flags";
+        + citiesEnum.getLongitude() +"," + time + "?exclude=daily,currently,flags";
   }
 }
