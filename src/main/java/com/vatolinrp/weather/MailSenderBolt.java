@@ -44,9 +44,6 @@ public class MailSenderBolt extends BaseRichBolt implements StormConstants {
   }
 
   public void execute( Tuple input ) {
-    WeatherConditionTO currentCondition = (WeatherConditionTO)input.getValueByField( "currentCondition" );
-    WeatherConditionTO forecastCondition = (WeatherConditionTO)input.getValueByField( "forecastCondition" );
-
     Session session = Session.getInstance( mailProperties, mailAuthenticator );
     Cache cache = cacheManager.getCache( "reportCache" );
     List keys = cache.getKeys();
@@ -62,27 +59,26 @@ public class MailSenderBolt extends BaseRichBolt implements StormConstants {
 
         buffer.append( "Hour accuracy for " + CitiesEnum.getNameByCityId( hourAccuracy.getLocationKey() ) + ": \n" );
         buffer.append( "Data provider: \n" );
-        if( ACCUWEATHER_API_TYPE.equals( forecastCondition.getApiType() ) ) {
+        if( ACCUWEATHER_API_TYPE.equals( hourAccuracy.getApiType() ) ) {
           buffer.append( ACCUWEATHER_HOST + "\n" );
         }
-        if( DARK_SKY_API_TYPE.equals( forecastCondition.getApiType() ) ) {
+        if( DARK_SKY_API_TYPE.equals( hourAccuracy.getApiType() ) ) {
           buffer.append( DARK_SKY_HOST + "\n" );
         }
         buffer.append( "Date: " + hourAccuracy.getDate().toString() + ", Hour: " + hourAccuracy.getHour() + "\n" );
         buffer.append( "Current temperature (in F): " + hourAccuracy.getActualTemperature() + "F\n" );
-        Double currentCelsius = getCelsius( hourAccuracy.getActualTemperature() );
+        Double currentCelsius = round( getCelsius( hourAccuracy.getActualTemperature() ) );
         buffer.append( "Current temperature (in C): " + currentCelsius + "C\n" );
         buffer.append( "Expected temperature (in F): " + hourAccuracy.getExpectedTemperature() + "F\n" );
-        Double expectedCelsius = getCelsius( hourAccuracy.getExpectedTemperature() );
+        Double expectedCelsius = round( getCelsius( hourAccuracy.getExpectedTemperature() ) );
         buffer.append( "Expected temperature (in C): " + expectedCelsius + "C\n" );
-        buffer.append( "-----" );
-      }
-
-      if( currentCondition.getTemperature().equals( forecastCondition.getTemperature() ) ) {
-        buffer.append( "Forecast was accurate for temperature prediction " );
-      } else {
-        buffer.append( "Forecast was not accurate for temperature prediction." );
-        buffer.append( "It was reported. Will use better weather sources later on." );
+        if( hourAccuracy.getActualTemperature().equals( hourAccuracy.getExpectedTemperature() ) ) {
+          buffer.append( "Forecast was accurate for temperature prediction " );
+        } else {
+          buffer.append( "Forecast was not accurate for temperature prediction." );
+          buffer.append( "It was reported. Will use better weather sources later on." );
+        }
+        buffer.append( "-----" + "\n" );
       }
       message.setText( buffer.toString() );
       Transport.send( message );
@@ -94,6 +90,10 @@ public class MailSenderBolt extends BaseRichBolt implements StormConstants {
 
   private Double getCelsius( Double fahrenheit ) {
     return (fahrenheit - 32.)/1.8;
+  }
+
+  private Double round( Double value ) {
+    return (double) Math.round(value * 100) / 100;
   }
   public void declareOutputFields( OutputFieldsDeclarer declarer ) {}
 }

@@ -4,7 +4,9 @@ import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import com.vatolinrp.weather.model.HourAccuracy;
 import com.vatolinrp.weather.model.WeatherConditionTO;
 import net.sf.ehcache.Cache;
@@ -19,10 +21,12 @@ public class DataCollectorBolt extends BaseRichBolt
   private static final Logger logger = Logger.getLogger( DataCollectorBolt.class.getName() );
   public static final String ID = "data-collector";
   private CacheManager cacheManager;
+  private OutputCollector boltOutputCollector;
 
   @Override
   public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
     cacheManager = CacheManager.newInstance();
+    boltOutputCollector = outputCollector;
   }
 
   @Override
@@ -30,10 +34,10 @@ public class DataCollectorBolt extends BaseRichBolt
     WeatherConditionTO currentCondition = null;
     WeatherConditionTO forecastCondition = null;
     if( tuple.contains( "currentCondition" ) ) {
-      currentCondition = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO-AW" );
+      currentCondition = ( WeatherConditionTO )tuple.getValueByField("currentCondition" );
     }
     if( tuple.contains( "forecastCondition" ) ) {
-      forecastCondition = ( WeatherConditionTO )tuple.getValueByField("weatherConditionTO-DS" );
+      forecastCondition = ( WeatherConditionTO )tuple.getValueByField("forecastCondition" );
     }
     if( currentCondition == null || forecastCondition == null ) {
       return;
@@ -46,12 +50,16 @@ public class DataCollectorBolt extends BaseRichBolt
     hourAccuracy.setExpectedTemperature( forecastCondition.getTemperature() );
     hourAccuracy.setHour( currentCondition.getTargetDate().getHour() );
     hourAccuracy.setApiType( currentCondition.getApiType() );
-    String key = hourAccuracy.getDate().toString() + "&" + hourAccuracy.getHour().toString();
+    String key = hourAccuracy.getDate().toString() + "&" + hourAccuracy.getHour().toString()
+      + "&" + hourAccuracy.getLocationKey();
     cache.put( new Element( key, hourAccuracy ) );
     logger.info( String.format( "DataCollectorBolt populated cache with key : %s and value: %s",
       key, hourAccuracy.toString() ) );
+    boltOutputCollector.emit( new Values( "notification" ) );
   }
 
   @Override
-  public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer ) {}
+  public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer ) {
+    outputFieldsDeclarer.declare( new Fields("notification" ) );
+  }
 }
