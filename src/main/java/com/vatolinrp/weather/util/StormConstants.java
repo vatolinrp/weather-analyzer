@@ -6,7 +6,7 @@ public interface StormConstants {
   String MAIL_FROM_PASSWORD = System.getenv("MAIL_PASSWORD" );
   String ACCUWEATHER_API_TYPE = "AW";
   String DARK_SKY_API_TYPE = "DS";
-  Long SLEEP_TIME = 1200000L;
+  Long SLEEP_TIME = 3600000L;
   String DARK_SKY_API_KEY = "70038fb5200adc067f7bd899890ee0cf";
   String ACCCUWEATHER_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
   String DARK_SKY_HOST = "api.darksky.net";
