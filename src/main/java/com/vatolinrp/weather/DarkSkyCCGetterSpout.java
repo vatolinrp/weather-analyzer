@@ -51,7 +51,7 @@ public class DarkSkyCCGetterSpout extends BaseRichSpout implements StormConstant
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
         logger.info( String.format( "current condition from dark sky api sent further with value: %s",
           weatherConditionTO.toString() ) );
-      } catch (IOException e) {
+      } catch ( Exception e ) {
         e.printStackTrace();
       }
     }

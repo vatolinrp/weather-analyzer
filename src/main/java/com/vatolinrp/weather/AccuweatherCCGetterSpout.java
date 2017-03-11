@@ -50,7 +50,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
         logger.info( String.format( "current condition from accuweather sent further with value: %s",
           weatherConditionTO.toString() ) );
-      } catch (IOException e) {
+      } catch ( Exception e ) {
         e.printStackTrace();
       }
     }

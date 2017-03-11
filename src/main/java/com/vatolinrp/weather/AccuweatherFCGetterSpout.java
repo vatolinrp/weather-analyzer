@@ -48,7 +48,7 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout implements StormCons
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
         logger.info( String.format( "forecast condition from accuweather sent further with value: %s",
           weatherConditionTO.toString()));
-      } catch (IOException e) {
+      } catch ( Exception e ) {
         e.printStackTrace();
       }
     }
