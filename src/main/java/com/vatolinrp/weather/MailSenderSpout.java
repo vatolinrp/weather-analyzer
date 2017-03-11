@@ -112,7 +112,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
       return false;
     }
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
-      fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service\n" );
+      fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service, Accuracy \n" );
       for( Object key: keys ) {
         Element element = cache.get( key );
         logger.info("getting object from reports for key: " + key );
@@ -143,6 +143,9 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     fileWriter.append( CalculationUtil.round( CalculationUtil.getCelsius( hourAccuracy.getActualTemperature() ) ).toString() );
     fileWriter.append( ',' );
     fileWriter.append( hourAccuracy.getApiType() );
+    fileWriter.append( ',' );
+    Double temperatureDiff = Math.abs( hourAccuracy.getExpectedTemperature() - hourAccuracy.getActualTemperature() );
+    fileWriter.append( AccuracyEnum.getAccuracyByFahrenheitDiff( temperatureDiff ).toString() );
     fileWriter.append("\n");
     fileWriter.flush();
   }
