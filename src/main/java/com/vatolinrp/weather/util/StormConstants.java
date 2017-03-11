@@ -12,5 +12,9 @@ public interface StormConstants {
   String DARK_SKY_HOST = "api.darksky.net";
   String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   Long HOUR = 3600L;
+  String MAIL_TO_ADDRESS = "vatolinrp@icloud.com";
   String REPORT_CACHE_NAME = "reports";
+  String COMMON_MESSAGE_SUBJECT = "Weather report";
+  String REPORT_FILE_NAME = "csvReportFile.csv";
+  String REPORT_FILE_LOCATION = "target/classes/csvReportFile.csv";
 }
