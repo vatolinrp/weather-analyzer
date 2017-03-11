@@ -10,7 +10,6 @@ import backtype.storm.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vatolinrp.weather.model.accuweather.HourForecast;
 import com.vatolinrp.weather.model.WeatherConditionTO;
-import com.vatolinrp.weather.model.accuweather.WeatherElement;
 import com.vatolinrp.weather.util.StormConstants;
 import org.springframework.web.client.RestTemplate;
 

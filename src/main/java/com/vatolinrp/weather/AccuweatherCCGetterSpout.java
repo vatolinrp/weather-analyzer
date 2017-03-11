@@ -63,8 +63,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
   }
 
   private WeatherConditionTO creareTO( WeatherElement weatherElement, CitiesEnum citiesEnum ) {
-    WeatherConditionTO weatherConditionTO;
-    weatherConditionTO = new WeatherConditionTO();
+    WeatherConditionTO weatherConditionTO = new WeatherConditionTO();
     weatherConditionTO.setTemperature( weatherElement.getTemperature().getImperial().getValue() );
     weatherConditionTO.setLocationKey( citiesEnum.getCityId() );
     ZonedDateTime date = ZonedDateTime.parse( weatherElement.getLocalObservationDateTime() );
