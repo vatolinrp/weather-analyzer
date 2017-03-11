@@ -39,7 +39,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
   private static final Logger logger = Logger.getLogger( MailSenderSpout.class.getName() );
   public static final String ID = "mail-sender";
   private URL reportFileUrl;
-
+  private static int numberOfReports;
   private Properties mailProperties;
   private CacheManager cacheManager;
   private MailAuthenticator mailAuthenticator;
@@ -52,17 +52,14 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     mailProperties.put( "mail.smtp.starttls.enable", "true" );
     mailAuthenticator = new MailAuthenticator();
     cacheManager = CacheManager.newInstance();
-    reportFileUrl = getClass().getClassLoader().getResource( REPORT_FILE_NAME );
   }
 
   public void nextTuple() {
     try{
-      if( LocalDateTime.now().getMinute() == 0 ) {
-        createCSVReportFile();
+      if( createCSVReportFile() ) {
         sendEmailWithReport();
         deleteCSVReportFile();
       }
-      Thread.sleep( SLEEP_TIME );
     } catch ( Exception ex ) {
       ex.printStackTrace();
     }
@@ -74,6 +71,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
   private void deleteCSVReportFile() {
     if ( new File( reportFileUrl.getFile() ).delete() ) {
       logger.info("successfully deleted csv file");
+      reportFileUrl = null;
     } else {
       logger.info("file was not deleted");
     }
@@ -100,15 +98,19 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     multipart.addBodyPart(messageBodyPart);
     message.setContent( multipart );
     Transport.send( message );
+    logger.info( "Email has been successfully sent" );
   }
 
   /**
    * Getting all objects from report cache
    * and saving them to csv file
    */
-  private void createCSVReportFile() throws IOException {
+  private boolean createCSVReportFile() throws IOException {
     Cache cache = cacheManager.getCache( REPORT_CACHE_NAME );
     List keys = cache.getKeys();
+    if( keys.size() == numberOfReports ) {
+      return false;
+    }
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
       fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service\n" );
       for( Object key: keys ) {
@@ -121,6 +123,9 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
       }
     }
     logger.info( "successfully created csv report file" );
+    numberOfReports = cache.getKeys().size();
+    reportFileUrl = getClass().getClassLoader().getResource( REPORT_FILE_NAME );
+    return true;
   }
   private void insertHourAccuracy( FileWriter fileWriter, HourAccuracy hourAccuracy ) throws IOException {
     fileWriter.append( CitiesEnum.getNameByCityId( hourAccuracy.getLocationKey() ).toString() );
