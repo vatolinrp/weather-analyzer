@@ -9,6 +9,7 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.vatolinrp.weather.model.HourAccuracy;
 import com.vatolinrp.weather.model.WeatherConditionTO;
+import com.vatolinrp.weather.util.StormConstants;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -16,7 +17,7 @@ import net.sf.ehcache.Element;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class DataCollectorBolt extends BaseRichBolt
+public class DataCollectorBolt extends BaseRichBolt implements StormConstants
 {
   private static final Logger logger = Logger.getLogger( DataCollectorBolt.class.getName() );
   public static final String ID = "data-collector";
@@ -42,7 +43,7 @@ public class DataCollectorBolt extends BaseRichBolt
     if( currentCondition == null || forecastCondition == null ) {
       return;
     }
-    Cache cache = cacheManager.getCache( "reportCache" );
+    Cache cache = cacheManager.getCache( REPORT_CACHE_NAME );
     HourAccuracy hourAccuracy = new HourAccuracy();
     hourAccuracy.setDate( currentCondition.getTargetDate().toLocalDate() );
     hourAccuracy.setLocationKey( currentCondition.getLocationKey() );

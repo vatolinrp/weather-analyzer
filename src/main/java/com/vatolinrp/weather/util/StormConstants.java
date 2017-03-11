@@ -12,4 +12,5 @@ public interface StormConstants {
   String DARK_SKY_HOST = "api.darksky.net";
   String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   Long HOUR = 3600L;
+  String REPORT_CACHE_NAME = "reports";
 }

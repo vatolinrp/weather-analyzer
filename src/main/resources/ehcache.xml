@@ -15,7 +15,7 @@
            transactionalMode="off">
         <persistence strategy="localTempSwap" />
     </cache>
-    <cache name="reportCache"
+    <cache name="reports"
            maxEntriesLocalHeap="1000000000"
            maxEntriesLocalDisk="1000"
            eternal="false"
