@@ -1,0 +1,35 @@
+http://www.ehcache.org/generated/2.9.0/html/ehc-all/#page/Ehcache_Documentation_Set%2Fco-over_what_is_ehcache.html%23
+
+2 Ehcache
+
+2.1 Введение в Ehcache
+
+Ehcache - основанный на стандартах кеш с открытым исходным кодом. Создан для повышения производительности, разгрузки баз данных и упрощения масштабирования программного продукта. Являясь надежным, проверенным и полнофункциональным решением, он наиболее широко используем на сегодняшний день в приложениях, написанных на Java. Можно использовать Ehcache как кеш общего назначения или как кэш второго уровня для Hibernate. Также можно дополнительно интегрировать его с продуктами сторонних производителей, такими как ColdFusion, Google App Engine и Spring.
+Ehcache предоставляет кэш в процессе, который можно реплицировать на нескольких узлах. Он также лежит в основе BigMemory Go и BigMemory Max, коммерческого кэширования Terracotta и хранения данных в памяти. Массив Terracotta Server Array, поставляемый с BigMemory Max, позволяет использовать смешанные конфигурации в процессе или вне процесса с кэшами размером в терабайт.
+
+2.2 Терминология
+
+Cache - Википедия определяет этот термин как “a store of things that will be required in the future, and can be retrieved rapidly.”, что в переводится как хранилище вещей, которые потребуются в будущем, и которые могут быть быстро извлечены. Сам по себе кэш представляет собой набор временных данных, которые либо дублируют данные, расположенные в другом месте, либо являются результатом вычисления. Данные, которые уже находятся в кэше, могут быть повторно доступны с минимальными затратами с точки зрения времени и ресурсов.
+
+Cache hit - когда элемент данных запрашивается из кэша и он существует для данного ключа, то это случай носит название “кэш попадание” ( cache hit ).
+
+Cache miss - когда элемент данных запрашивается из кэша и он не существует для данного ключа, то данный случай носит название “кэш промах“ ( cache miss ).
+
+System of Record ( SOR ) - источник кэшированных данных. Кэш действует как локальное хранилище копий данных, полученных или сохраненных в системе записи (SOR). SOR часто является традиционной базой данных, хотя это может быть специализированная файловая система или какое-либо другое надежное долговременное хранилище. Работая с Ehcache, предполагается, что в качестве SOR используется база данных.
+
+Standalone cache topology - автономная кэш топология, при которой данные хранятся в узле приложения. Любые другие узлы приложения независимы, между ними нет связи. Если используется автономная топология, когда несколько узлов используют одно и то же приложение, то между ними существует слабая согласованность. Они содержат согласованные значения для неизменяемых данных или обновляют элемент данных после того, как время жизни элемента завершилось.
+
+Distributed cache topology - распределенная кэш топология, данные хранятся на удаленном сервере ( или кластере серверов ) с поднабором недавно используемых данных, хранящихся в каждом узле приложения. Эта топология предлагает богатый набор параметров для согласованности. Распределенная топология является рекомендуемым подходом в кластерной или масштабируемой прикладной среде. Она обеспечивает высочайший уровень производительности, доступности и масштабируемости. Распределенная топология доступна только с BigMemory Max.
+
+
+
+/**
+Topology Types
+Standalone – The data set is held in the application node. Any other application nodes are independent with no communication between them. If a standalone topology is used where there are multiple application nodes running the same application, then there is Weak Consistency between them. They contain consistent values for immutable data or after the time-to-live on an element has completed and the element needs to be reloaded.
+Distributed – The data is held in a remote server (or array of servers) with a subset of recently used data held in each application node. This topology offers a rich set of consistency options.
+A distributed topology is the recommended approach in a clustered or scaled-out application environment. It provides the highest level of performance, availability, and scalability. The distributed topology is available only with BigMemory Max.
+Replicated – The cached data set is held in each application node and data is copied or invalidated across the nodes without locking. Replication can be either asynchronous or synchronous, where the writing thread blocks while propagation occurs. The only consistency mode supported in this topology is Weak Consistency.
+Many production applications are deployed in clusters of multiple instances for availability and scalability. However, without a distributed or replicated cache, application clusters exhibit a number of undesirable behaviors, such as:
+Cache Drift - If each application instance maintains its own cache, updates made to one cache will not appear in the other instances. This also happens to web session data. A distributed or replicated cache ensures that all of the cache instances are kept in sync with each other.
+Database Bottlenecks - In a single-instance application, a cache effectively shields a database from the overhead of redundant queries. However, in a distributed application environment, each instance much load and keep its own cache fresh. The overhead of loading and refreshing multiple caches leads to database bottlenecks as more application instances are added. A distributed or replicated cache eliminates the per-instance overhead of loading and refreshing multiple caches from a database.
+**/
