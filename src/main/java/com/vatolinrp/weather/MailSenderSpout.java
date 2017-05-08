@@ -76,7 +76,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
         deleteCSVReportFile();
       }
     } catch ( Exception ex ) {
-      ex.printStackTrace();
+      logger.warning( "Was not able to send a report because of " + ex.getMessage() );
     }
   }
 
