@@ -51,6 +51,22 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     mailProperties.put( "mail.smtp.starttls.enable", "true" );
     mailAuthenticator = new MailAuthenticator();
     cacheManager = CacheManager.newInstance();
+    sendGreetingMessage();
+  }
+
+  private void sendGreetingMessage() {
+    try {
+      Session session = Session.getInstance( mailProperties, mailAuthenticator );
+      MimeMessage message = new MimeMessage( session );
+      message.setFrom( new InternetAddress( MAIL_FROM ) );
+      message.addRecipient( Message.RecipientType.TO, new InternetAddress( MAIL_TO_ADDRESS ) );
+      message.setSubject( "Greeting message" );
+      message.setText( "Hello, you have been chosen as a weather report consumer" );
+      Transport.send( message );
+      logger.info("Email has been successfully sent" );
+    } catch ( MessagingException e ) {
+      throw new RuntimeException( "Not able to send report emails. Quitting the application", e );
+    }
   }
 
   public void nextTuple() {
