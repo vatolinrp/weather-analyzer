@@ -3,3 +3,6 @@ target/
 *.iml
 *.DS_Store
 *._*
+logs/
+*.data
+*.lock
