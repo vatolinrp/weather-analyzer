@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**
@@ -28,11 +29,13 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;
+  private static AtomicInteger currentCondRequestsExecuted;
 
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
     spoutOutputCollector = collector;
     restTemplate = new RestTemplate();
     objectMapper = new ObjectMapper();
+    currentCondRequestsExecuted = new AtomicInteger(0);
   }
   public void declareOutputFields(OutputFieldsDeclarer declarer) {
     declarer.declare( new Fields( TRANSFER_VALUE ) );
@@ -44,6 +47,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
         String url = createURL( city );
         logger.info("requesting data using this url: " + url );
         String response = restTemplate.getForObject( url, String.class );
+        logger.info("total number of forecast request executions is " + currentCondRequestsExecuted.incrementAndGet() );
         WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class)[0];
         WeatherConditionTO weatherConditionTO = creareTO( weatherElement, city );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );

@@ -19,12 +19,14 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class DarkSkyCCGetterSpout extends BaseRichSpout implements StormConstants {
   public static final String ID = "current-darksky-cond";
   private static final Logger logger = Logger.getLogger( DarkSkyCCGetterSpout.class.getName() );
   private static final String TRANSFER_VALUE = "weatherConditionTO-DS";
+  private static AtomicInteger currentCondRequestsExecuted;
 
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
@@ -35,6 +37,7 @@ public class DarkSkyCCGetterSpout extends BaseRichSpout implements StormConstant
     spoutOutputCollector = collector;
     restTemplate = new RestTemplate();
     objectMapper = new ObjectMapper();
+    currentCondRequestsExecuted = new AtomicInteger(0);
   }
 
   @Override
@@ -45,6 +48,7 @@ public class DarkSkyCCGetterSpout extends BaseRichSpout implements StormConstant
         String url = createURL( city, time );
         logger.info("requesting data using this url: " + url );
         String response = restTemplate.getForObject( url, String.class );
+        logger.info("total number of forecast request executions is " + currentCondRequestsExecuted.incrementAndGet() );
         DarkSkyResponse weatherElement = objectMapper.readValue( response, DarkSkyResponse.class );
         WeatherConditionTO weatherConditionTO = createTO( weatherElement, city );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );

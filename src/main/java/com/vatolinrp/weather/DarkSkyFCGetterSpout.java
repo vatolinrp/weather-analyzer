@@ -20,6 +20,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstants {
@@ -30,12 +31,14 @@ public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstant
   private SpoutOutputCollector spoutOutputCollector;
   private static RestTemplate restTemplate;
   private static ObjectMapper objectMapper;
+  private static AtomicInteger forecastRequestsExecuted;
 
   @Override
   public void open( Map map, TopologyContext topologyContext, SpoutOutputCollector collector ) {
     spoutOutputCollector = collector;
     restTemplate = new RestTemplate();
     objectMapper = new ObjectMapper();
+    forecastRequestsExecuted = new AtomicInteger(0);
   }
 
   @Override
@@ -46,6 +49,7 @@ public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstant
         String url = createURL( city, time );
         logger.info("requesting data using this url: " + url );
         String response = restTemplate.getForObject( url, String.class );
+        logger.info("total number of forecast request executions is " + forecastRequestsExecuted.incrementAndGet() );
         DarkSkyResponse weatherElement = objectMapper.readValue( response, DarkSkyResponse.class );
         HourlyDatum oneHourForecast = null;
         for (HourlyDatum hourlyDatum : weatherElement.getHourly().getData()) {
