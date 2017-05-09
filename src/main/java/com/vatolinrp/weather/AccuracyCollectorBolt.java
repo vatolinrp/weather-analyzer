@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 public class AccuracyCollectorBolt extends BaseRichBolt implements StormConstants
 {
   private static final Logger logger = Logger.getLogger( AccuracyCollectorBolt.class.getName() );
-  public static final String ID = "data-collector";
+  public static final String ID = "accuracy-collector";
   private CacheManager cacheManager;
 
   @Override
