@@ -1,7 +1,6 @@
 package com.vatolinrp.weather.util;
 
 public interface StormConstants {
-  String MINSK_CANNONICAL_LOCATION_KEY = "28580";
   String MAIL_FROM = "vatolinrp@mail.ru";
   String MAIL_FROM_PASSWORD = System.getenv("MAIL_PASSWORD" );
   String ACCUWEATHER_API_TYPE = "AW";
@@ -14,6 +13,7 @@ public interface StormConstants {
   Long HOUR = 3600L;
   String MAIL_TO_ADDRESS = "vatolinrp@icloud.com";
   String REPORT_CACHE_NAME = "reports";
+  String ACCURACY_COUNTERS_CACHE_NAME = "accuracyCounters";
   String COMMON_MESSAGE_SUBJECT = "Weather report";
   String REPORT_FILE_NAME = "csvReportFile.csv";
   String REPORT_FILE_LOCATION = "target/classes/csvReportFile.csv";

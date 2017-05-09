@@ -1,5 +1,9 @@
 package com.vatolinrp.weather;
 
+import com.vatolinrp.weather.model.AccuracyEnum;
+import com.vatolinrp.weather.model.AccuracyResult;
+import com.vatolinrp.weather.model.ApiEnum;
+import com.vatolinrp.weather.model.CitiesEnum;
 import com.vatolinrp.weather.model.HourAccuracy;
 import com.vatolinrp.weather.util.CalculationUtil;
 import com.vatolinrp.weather.util.StormConstants;
@@ -28,6 +32,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -121,24 +126,45 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
    * and saving them to csv file
    */
   private boolean createCSVReportFile() throws IOException {
-    Cache cache = cacheManager.getCache( REPORT_CACHE_NAME );
-    List keys = cache.getKeys();
+    Cache reportCache = cacheManager.getCache( REPORT_CACHE_NAME );
+    Cache accuracyCache = cacheManager.getCache( ACCURACY_COUNTERS_CACHE_NAME );
+    List keys = reportCache.getKeys();
     if( keys.size() == numberOfReports ) {
       return false;
     }
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
       fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service, Accuracy \n" );
       for( Object key: keys ) {
-        Element element = cache.get( key );
+        Element element = reportCache.get( key );
         logger.info("getting object from reports for key: " + key );
         if( element.getObjectValue() instanceof HourAccuracy ) {
           HourAccuracy hourAccuracy = (HourAccuracy)element.getObjectValue();
           insertHourAccuracy( fileWriter, hourAccuracy );
         }
       }
+
+      fileWriter.append( "Location, Best weather service \n" );
+      for( CitiesEnum cityEnumValue : CitiesEnum.values() ) {
+        Map<Double, ApiEnum> accuracyMap = new HashMap<>();
+        for( ApiEnum apiEnumValue : ApiEnum.values() ) {
+          String accuracyKey = "accuracy_counter:" + apiEnumValue.getCode() + "&" + cityEnumValue.getCityId();
+          Element element = accuracyCache.get( accuracyKey );
+          if( element.getObjectValue() instanceof AccuracyResult) {
+            AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
+            accuracyMap.put( accuracyResult.getAccuracyPercent(), apiEnumValue );
+          }
+        }
+        Double bestPercent = .0;
+        for( Double currentPercent : accuracyMap.keySet() ) {
+          if( currentPercent >= bestPercent ) {
+            bestPercent = currentPercent;
+          }
+        }
+        fileWriter.append( cityEnumValue + "," + accuracyMap.get( bestPercent).getName() + "\n" );
+      }
     }
     logger.info( "successfully created csv report file" );
-    numberOfReports = cache.getKeys().size();
+    numberOfReports = reportCache.getKeys().size();
     reportFileUrl = getClass().getClassLoader().getResource( REPORT_FILE_NAME );
     return true;
   }
@@ -157,7 +183,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     fileWriter.append( ',' );
     fileWriter.append( CalculationUtil.round( CalculationUtil.getCelsius( hourAccuracy.getActualTemperature() ) ).toString() );
     fileWriter.append( ',' );
-    fileWriter.append( hourAccuracy.getApiType() );
+    fileWriter.append( hourAccuracy.getApiType().getCode() );
     fileWriter.append( ',' );
     Double temperatureDiff = Math.abs( hourAccuracy.getExpectedTemperature() - hourAccuracy.getActualTemperature() );
     fileWriter.append( AccuracyEnum.getAccuracyByFahrenheitDiff( temperatureDiff ).toString() );

@@ -1,6 +1,8 @@
 package com.vatolinrp.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vatolinrp.weather.model.ApiEnum;
+import com.vatolinrp.weather.model.CitiesEnum;
 import com.vatolinrp.weather.model.accuweather.HourForecast;
 import com.vatolinrp.weather.model.WeatherConditionTO;
 import com.vatolinrp.weather.util.StormConstants;
@@ -68,7 +70,7 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout implements StormCons
     weatherConditionTO.setLocationKey( city.getCityId() );
     ZonedDateTime date = ZonedDateTime.parse( hourForecast.getDateTime() );
     weatherConditionTO.setTargetDate( date );
-    weatherConditionTO.setApiType( ACCUWEATHER_API_TYPE );
+    weatherConditionTO.setApiType( ApiEnum.AW );
     String key = city.getCityId() + "&" + date.getDayOfMonth() + "&" + date.getHour() + "&" + ACCUWEATHER_API_TYPE;
     weatherConditionTO.setTransferKey(key);
     return weatherConditionTO;

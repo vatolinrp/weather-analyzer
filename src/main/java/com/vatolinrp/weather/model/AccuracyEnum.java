@@ -1,4 +1,4 @@
-package com.vatolinrp.weather;
+package com.vatolinrp.weather.model;
 
 public enum AccuracyEnum {
   ACCURATE( .5, 1. ),

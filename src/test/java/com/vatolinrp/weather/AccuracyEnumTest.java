@@ -1,5 +1,6 @@
 package com.vatolinrp.weather;
 
+import com.vatolinrp.weather.model.AccuracyEnum;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

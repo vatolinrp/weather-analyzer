@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public @Data class LocationAccuracy implements Serializable{
   private Integer hour;
   private LocalDate date;
-  private String apiType;
+  private ApiEnum apiType;
   private String locationKey;
   private Double temperatureDifference;
 }

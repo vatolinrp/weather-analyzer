@@ -35,10 +35,10 @@ public class DataCollectorBolt extends BaseRichBolt implements StormConstants
     WeatherConditionTO currentCondition = null;
     WeatherConditionTO forecastCondition = null;
     if( tuple.contains( "currentCondition" ) ) {
-      currentCondition = ( WeatherConditionTO )tuple.getValueByField("currentCondition" );
+      currentCondition = ( WeatherConditionTO )tuple.getValueByField( "currentCondition" );
     }
     if( tuple.contains( "forecastCondition" ) ) {
-      forecastCondition = ( WeatherConditionTO )tuple.getValueByField("forecastCondition" );
+      forecastCondition = ( WeatherConditionTO )tuple.getValueByField( "forecastCondition" );
     }
     if( currentCondition == null || forecastCondition == null ) {
       return;
@@ -56,11 +56,11 @@ public class DataCollectorBolt extends BaseRichBolt implements StormConstants
     cache.put( new Element( key, hourAccuracy ) );
     logger.info( String.format( "DataCollectorBolt populated cache with key : %s and value: %s",
       key, hourAccuracy.toString() ) );
-    boltOutputCollector.emit( new Values( "notification" ) );
+    boltOutputCollector.emit( new Values( hourAccuracy ) );
   }
 
   @Override
   public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer ) {
-    outputFieldsDeclarer.declare( new Fields("notification" ) );
+    outputFieldsDeclarer.declare( new Fields( "hourAccuracy" ) );
   }
 }

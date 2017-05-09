@@ -1,6 +1,8 @@
 package com.vatolinrp.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vatolinrp.weather.model.ApiEnum;
+import com.vatolinrp.weather.model.CitiesEnum;
 import com.vatolinrp.weather.model.WeatherConditionTO;
 import com.vatolinrp.weather.model.darksky.DarkSkyResponse;
 import com.vatolinrp.weather.model.darksky.HourlyDatum;
@@ -87,7 +89,7 @@ public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstant
     String key = citiesEnum.getCityId() + "&" + zonedDateTime.getDayOfMonth() + "&"
         + zonedDateTime.getHour() + "&" + DARK_SKY_API_TYPE;
     weatherConditionTO.setTransferKey( key );
-    weatherConditionTO.setApiType( DARK_SKY_API_TYPE );
+    weatherConditionTO.setApiType( ApiEnum.DS );
     return weatherConditionTO;
   }
 
