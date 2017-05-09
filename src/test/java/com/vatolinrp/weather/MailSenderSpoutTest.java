@@ -1,5 +1,6 @@
 package com.vatolinrp.weather;
 
+import com.vatolinrp.weather.model.ApiEnum;
 import com.vatolinrp.weather.model.HourAccuracy;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -20,7 +21,7 @@ public class MailSenderSpoutTest {
     CacheManager cacheManager = CacheManager.newInstance();
     Cache cache = cacheManager.getCache( "reports" );
     HourAccuracy hourAccuracy = new HourAccuracy();
-    hourAccuracy.setApiType( "test api type" );
+    hourAccuracy.setApiType( ApiEnum.AW );
     hourAccuracy.setHour( 13 );
     hourAccuracy.setLocationKey( "28580" );
     hourAccuracy.setExpectedTemperature( 1. );
