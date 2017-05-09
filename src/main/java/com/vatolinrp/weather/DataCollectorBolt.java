@@ -52,7 +52,7 @@ public class DataCollectorBolt extends BaseRichBolt implements StormConstants
     hourAccuracy.setHour( currentCondition.getTargetDate().getHour() );
     hourAccuracy.setApiType( currentCondition.getApiType() );
     String key = hourAccuracy.getDate().toString() + "&" + hourAccuracy.getHour().toString()
-      + "&" + hourAccuracy.getLocationKey();
+      + "&" + hourAccuracy.getLocationKey() + "&" + hourAccuracy.getApiType();
     cache.put( new Element( key, hourAccuracy ) );
     logger.info( String.format( "DataCollectorBolt populated cache with key : %s and value: %s",
       key, hourAccuracy.toString() ) );
