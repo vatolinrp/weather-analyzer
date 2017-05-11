@@ -15,9 +15,9 @@ import org.apache.storm.tuple.Values;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class CacheExtractorBolt extends BaseRichBolt {
-  public static final String ID = "cache-extractor";
-  private static final Logger logger = Logger.getLogger( CacheExtractorBolt.class.getName() );
+public class AggregatorBolt extends BaseRichBolt {
+  public static final String ID = "aggregator";
+  private static final Logger logger = Logger.getLogger( AggregatorBolt.class.getName() );
   private OutputCollector boltOutputCollector;
   private CacheManager cacheManager;
 

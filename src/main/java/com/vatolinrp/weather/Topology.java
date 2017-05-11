@@ -25,14 +25,14 @@ public class Topology {
     topologyBuilder.setSpout( DarkSkyFCGetterSpout.ID, darkSkyFCGetterSpout ).setNumTasks( 1 ).setMaxSpoutPending( 250 );
     topologyBuilder.setSpout( AccuweatherCCGetterSpout.ID, accuweatherCCGetterSpout ).setNumTasks( 1 ).setMaxSpoutPending( 250 );
     topologyBuilder.setSpout( AccuweatherFCGetterSpout.ID, accuweatherFCGetterSpout ).setNumTasks( 1 ).setMaxSpoutPending( 250 );
-    CacheExtractorBolt cacheExtractorBolt = new CacheExtractorBolt();
+    AggregatorBolt aggregatorBolt = new AggregatorBolt();
     CacheSaverBolt cacheSaverBolt = new CacheSaverBolt();
     DataCollectorBolt dataCollectorBolt = new DataCollectorBolt();
     topologyBuilder.setBolt( CacheSaverBolt.ID, cacheSaverBolt )
       .shuffleGrouping( AccuweatherFCGetterSpout.ID ).shuffleGrouping( DarkSkyFCGetterSpout.ID );
-    topologyBuilder.setBolt( CacheExtractorBolt.ID, cacheExtractorBolt )
+    topologyBuilder.setBolt( AggregatorBolt.ID, aggregatorBolt)
       .shuffleGrouping( AccuweatherCCGetterSpout.ID ).shuffleGrouping( DarkSkyCCGetterSpout.ID );
-    topologyBuilder.setBolt( DataCollectorBolt.ID, dataCollectorBolt ).shuffleGrouping( CacheExtractorBolt.ID );
+    topologyBuilder.setBolt( DataCollectorBolt.ID, dataCollectorBolt ).shuffleGrouping( AggregatorBolt.ID );
     AccuracyCollectorBolt accuracyCollectorBolt = new AccuracyCollectorBolt();
     topologyBuilder.setBolt( AccuracyCollectorBolt.ID, accuracyCollectorBolt ).shuffleGrouping( DataCollectorBolt.ID );
     StormTopology stormTopology = topologyBuilder.createTopology();
