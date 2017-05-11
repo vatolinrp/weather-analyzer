@@ -18,10 +18,10 @@ import org.apache.storm.tuple.Tuple;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class AccuracyCollectorBolt extends BaseRichBolt implements StormConstants
+public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
 {
-  private static final Logger logger = Logger.getLogger( AccuracyCollectorBolt.class.getName() );
-  public static final String ID = "accuracy-collector";
+  private static final Logger logger = Logger.getLogger( AccuracyAnalyzerBolt.class.getName() );
+  public static final String ID = "accuracy-analyzer";
   private CacheManager cacheManager;
 
   @Override

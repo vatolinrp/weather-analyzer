@@ -33,8 +33,8 @@ public class Topology {
     topologyBuilder.setBolt( AggregatorBolt.ID, aggregatorBolt)
       .shuffleGrouping( AccuweatherCCGetterSpout.ID ).shuffleGrouping( DarkSkyCCGetterSpout.ID );
     topologyBuilder.setBolt( DataCollectorBolt.ID, dataCollectorBolt ).shuffleGrouping( AggregatorBolt.ID );
-    AccuracyCollectorBolt accuracyCollectorBolt = new AccuracyCollectorBolt();
-    topologyBuilder.setBolt( AccuracyCollectorBolt.ID, accuracyCollectorBolt ).shuffleGrouping( DataCollectorBolt.ID );
+    AccuracyAnalyzerBolt accuracyAnalyzerBolt = new AccuracyAnalyzerBolt();
+    topologyBuilder.setBolt( AccuracyAnalyzerBolt.ID, accuracyAnalyzerBolt).shuffleGrouping( DataCollectorBolt.ID );
     StormTopology stormTopology = topologyBuilder.createTopology();
     LocalCluster localCluster = new LocalCluster();
     localCluster.submitTopology( TOPOLOGY_NAME, config, stormTopology );
