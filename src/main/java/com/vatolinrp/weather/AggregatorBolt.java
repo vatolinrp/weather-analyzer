@@ -44,7 +44,7 @@ public class AggregatorBolt extends BaseRichBolt {
     Cache cache = cacheManager.getCache( "hourForecast" );
     if( cache.isKeyInCache( transferKey ) ) {
       Element element = cache.get( transferKey );
-      if( element != null ) {
+      if( element != null && element.getObjectValue() instanceof WeatherConditionTO ) {
         WeatherConditionTO forecastWeatherConditionTO = ( WeatherConditionTO )element.getObjectValue();
         logger.info( String.format( "got from cache value : %s", forecastWeatherConditionTO.toString() ) );
         boltOutputCollector.emit( new Values( forecastWeatherConditionTO, currentWeatherConditionTO ) );

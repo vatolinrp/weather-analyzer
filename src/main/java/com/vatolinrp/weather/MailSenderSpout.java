@@ -81,7 +81,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
         deleteCSVReportFile();
       }
     } catch ( Exception ex ) {
-      logger.warning( "Was not able to send a report because of " + ex.getMessage() );
+      ex.printStackTrace();
     }
   }
 
@@ -135,23 +135,26 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
       fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service, Accuracy \n" );
       for( Object key: keys ) {
-        Element element = reportCache.get( key );
-        logger.info("getting object from reports for key: " + key );
-        if( element.getObjectValue() instanceof HourAccuracy ) {
-          HourAccuracy hourAccuracy = (HourAccuracy)element.getObjectValue();
-          insertHourAccuracy( fileWriter, hourAccuracy );
+        if( reportCache.isKeyInCache( key ) ) {
+          Element element = reportCache.get( key );
+          if( element != null && element.getObjectValue() instanceof HourAccuracy ) {
+            logger.info("getting object from reports for key: " + key );
+            HourAccuracy hourAccuracy = (HourAccuracy)element.getObjectValue();
+            insertHourAccuracy( fileWriter, hourAccuracy );
+          }
         }
       }
-
       fileWriter.append( "Location, Best weather service \n" );
       for( CitiesEnum cityEnumValue : CitiesEnum.values() ) {
         Map<Double, ApiEnum> accuracyMap = new HashMap<>();
         for( ApiEnum apiEnumValue : ApiEnum.values() ) {
           String accuracyKey = "accuracy_counter:" + apiEnumValue.getCode() + "&" + cityEnumValue.getCityId();
-          Element element = accuracyCache.get( accuracyKey );
-          if( element.getObjectValue() instanceof AccuracyResult) {
-            AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
-            accuracyMap.put( accuracyResult.getAccuracyPercent(), apiEnumValue );
+          if( accuracyCache.isKeyInCache( accuracyKey ) ) {
+            Element element = accuracyCache.get( accuracyKey );
+            if( element != null && element.getObjectValue() instanceof AccuracyResult ) {
+              AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
+              accuracyMap.put( accuracyResult.getAccuracyPercent(), apiEnumValue );
+            }
           }
         }
         Double bestPercent = .0;
@@ -160,7 +163,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
             bestPercent = currentPercent;
           }
         }
-        fileWriter.append( cityEnumValue + "," + accuracyMap.get( bestPercent).getName() + "\n" );
+        fileWriter.append( cityEnumValue + "," + accuracyMap.get( bestPercent ).getName() + "\n" );
       }
     }
     logger.info( "successfully created csv report file" );
