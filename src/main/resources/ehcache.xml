@@ -9,7 +9,6 @@
          maxEntriesLocalDisk="1000"
          eternal="false"
          diskSpoolBufferSizeMB="200"
-         timeToIdleSeconds="7200" timeToLiveSeconds="7200"
          memoryStoreEvictionPolicy="LFU"
          transactionalMode="off">
     <persistence strategy="localTempSwap" />
@@ -19,7 +18,6 @@
          maxEntriesLocalDisk="1000"
          eternal="false"
          diskSpoolBufferSizeMB="200"
-         timeToIdleSeconds="7200" timeToLiveSeconds="7200"
          memoryStoreEvictionPolicy="LFU"
          transactionalMode="off">
     <persistence strategy="localTempSwap" />
@@ -29,7 +27,6 @@
          maxEntriesLocalDisk="1000"
          eternal="false"
          diskSpoolBufferSizeMB="200"
-         timeToIdleSeconds="7200" timeToLiveSeconds="7200"
          memoryStoreEvictionPolicy="LFU"
          transactionalMode="off">
     <persistence strategy="localTempSwap" />
