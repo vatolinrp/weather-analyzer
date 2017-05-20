@@ -14,6 +14,7 @@ import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichSpout;
+import org.apache.storm.utils.Utils;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -47,6 +48,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
   private Properties mailProperties;
   private CacheManager cacheManager;
   private MailAuthenticator mailAuthenticator;
+  private static final Long MINUTE_SLEEP_TIME = 60000L;
 
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
     mailProperties = new Properties();
@@ -132,6 +134,7 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     if( keys.size() == numberOfReports ) {
       return false;
     }
+    Utils.sleep( MINUTE_SLEEP_TIME );
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
       fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service, Accuracy \n" );
       for( Object key: keys ) {
