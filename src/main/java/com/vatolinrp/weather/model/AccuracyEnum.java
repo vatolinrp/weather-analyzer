@@ -2,10 +2,10 @@ package com.vatolinrp.weather.model;
 
 public enum AccuracyEnum {
   ACCURATE_TEMPERATURE( .5, 1. ),
-  ACCURATE_PRESSURE( 1 ),
+  ACCURATE_PRESSURE( 1. ),
   CLOSE_TO_ACCURATE_TEMPERATURE( 1., 2. ),
-  CLOSE_TO_ACCURATE_PRESSURE( 2 ),
-  NOT_ACCURATE_PRESSURE( 10 ),
+  CLOSE_TO_ACCURATE_PRESSURE( 2. ),
+  NOT_ACCURATE_PRESSURE( 10. ),
   NOT_ACCURATE_TEMPERATURE( 10., 10. );
 
   AccuracyEnum( Double rangeInCelsius, Double rangeInFahrenheit ) {
@@ -13,13 +13,13 @@ public enum AccuracyEnum {
     this.rangeInFahrenheit = rangeInFahrenheit;
   }
 
-  AccuracyEnum( Integer rangeInBarometric ) {
+  AccuracyEnum( Double rangeInBarometric ) {
     this.rangeInBarometric = rangeInBarometric;
   }
 
   private Double rangeInCelsius;
   private Double rangeInFahrenheit;
-  private Integer rangeInBarometric;
+  private Double rangeInBarometric;
 
   public static AccuracyEnum getAccuracyByFahrenheitDiff( Double diff ) {
     if( diff <= ACCURATE_TEMPERATURE.getRangeInFahrenheit() ){
@@ -31,7 +31,7 @@ public enum AccuracyEnum {
     return NOT_ACCURATE_TEMPERATURE;
   }
 
-  public static AccuracyEnum getAccuracyByBarometricDiff( Integer diff ) {
+  public static AccuracyEnum getAccuracyByBarometricDiff( Double diff ) {
     if( diff <= ACCURATE_PRESSURE.getRangeInBarometric() ){
       return ACCURATE_PRESSURE;
     }
@@ -59,7 +59,7 @@ public enum AccuracyEnum {
     return rangeInFahrenheit;
   }
 
-  public Integer getRangeInBarometric() {
+  public Double getRangeInBarometric() {
     return rangeInBarometric;
   }
 }
