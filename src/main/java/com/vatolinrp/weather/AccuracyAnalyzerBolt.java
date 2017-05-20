@@ -51,15 +51,15 @@ public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
       AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
       Double temperatureDiff = Math.abs( hourAccuracy.getExpectedTemperature() - hourAccuracy.getActualTemperature() );
       switch ( AccuracyEnum.getAccuracyByFahrenheitDiff( temperatureDiff ) ) {
-        case ACCURATE: {
+        case ACCURATE_TEMPERATURE: {
           accuracyResult.incrementAccurateCounter();
           break;
         }
-        case CLOSE_TO_ACCURATE: {
+        case CLOSE_TO_ACCURATE_TEMPERATURE: {
           accuracyResult.incrementCloseToAccurateCounter();
           break;
         }
-        case NOT_ACCURATE: {
+        case NOT_ACCURATE_TEMPERATURE: {
           accuracyResult.incrementNotAccurateCounter();
           break;
         }
