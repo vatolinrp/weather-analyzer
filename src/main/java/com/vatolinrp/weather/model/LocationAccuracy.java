@@ -11,4 +11,5 @@ public @Data class LocationAccuracy implements Serializable{
   private ApiEnum apiType;
   private String locationKey;
   private Double temperatureDifference;
+  private Double windSpeedDifference;
 }

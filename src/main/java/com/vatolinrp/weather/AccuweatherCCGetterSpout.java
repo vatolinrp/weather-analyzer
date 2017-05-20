@@ -51,7 +51,7 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
         String response = restTemplate.getForObject( url, String.class );
         logger.info("total number of forecast request executions is " + currentCondRequestsExecuted.incrementAndGet() );
         WeatherElement weatherElement = objectMapper.readValue( response, WeatherElement[].class)[0];
-        WeatherConditionTO weatherConditionTO = creareTO( weatherElement, city );
+        WeatherConditionTO weatherConditionTO = createTO( weatherElement, city );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
         logger.info( String.format( "current condition from accuweather sent further with value: %s",
           weatherConditionTO.toString() ) );
@@ -63,13 +63,14 @@ public class AccuweatherCCGetterSpout extends BaseRichSpout implements StormCons
   }
 
   private String createURL( CitiesEnum citiesEnum ) {
-    return String.format( "http://" + ACCUWEATHER_HOST + "/currentconditions/v1/%s?apikey=%s",
+    return String.format( "http://" + ACCUWEATHER_HOST + "/currentconditions/v1/%s?apikey=%s&details=true",
       citiesEnum.getCityId(), ACCCUWEATHER_API_KEY );
   }
 
-  private WeatherConditionTO creareTO( WeatherElement weatherElement, CitiesEnum citiesEnum ) {
+  private WeatherConditionTO createTO( WeatherElement weatherElement, CitiesEnum citiesEnum ) {
     WeatherConditionTO weatherConditionTO = new WeatherConditionTO();
     weatherConditionTO.setTemperature( weatherElement.getTemperature().getImperial().getValue() );
+    weatherConditionTO.setWindSpeed( weatherElement.getWind().getSpeed().getImperial().getValue() );
     weatherConditionTO.setLocationKey( citiesEnum.getCityId() );
     ZonedDateTime date = ZonedDateTime.parse( weatherElement.getLocalObservationDateTime() );
     weatherConditionTO.setTargetDate( date );

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.vatolinrp.weather.model.accuweather.Temperature;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,6 +19,7 @@ import com.vatolinrp.weather.model.accuweather.Temperature;
         "WeatherIcon",
         "IsDayTime",
         "Temperature",
+        "Wind",
         "MobileLink",
         "Link"
 })
@@ -37,6 +37,8 @@ public class WeatherElement {
   private Boolean isDayTime;
   @JsonProperty("Temperature")
   private Temperature temperature;
+  @JsonProperty("Wind")
+  private CurrentWind wind;
   @JsonProperty("MobileLink")
   private String mobileLink;
   @JsonProperty("Link")
@@ -138,6 +140,22 @@ public class WeatherElement {
   @JsonProperty("Temperature")
   public void setTemperature(Temperature temperature) {
     this.temperature = temperature;
+  }
+
+  /**
+   * @return The wind
+   */
+  @JsonProperty("Wind")
+  public CurrentWind getWind() {
+    return wind;
+  }
+
+  /**
+   * @param wind The Wind
+   */
+  @JsonProperty("Wind")
+  public void setWind(CurrentWind wind) {
+    this.wind = wind;
   }
 
   /**

@@ -83,6 +83,7 @@ public class DarkSkyFCGetterSpout extends BaseRichSpout implements StormConstant
   private WeatherConditionTO createTO( HourlyDatum hourlyDatum, CitiesEnum citiesEnum ) {
     WeatherConditionTO weatherConditionTO = new WeatherConditionTO();
     weatherConditionTO.setTemperature( hourlyDatum.getTemperature() );
+    weatherConditionTO.setWindSpeed( hourlyDatum.getWindSpeed() );
     weatherConditionTO.setLocationKey( citiesEnum.getCityId() );
     ZonedDateTime zonedDateTime = createTargetDate( hourlyDatum, citiesEnum.getTimeZone() );
     weatherConditionTO.setTargetDate( zonedDateTime );

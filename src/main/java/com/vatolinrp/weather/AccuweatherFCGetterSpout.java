@@ -48,7 +48,7 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout implements StormCons
         String response = restTemplate.getForObject( url, String.class );
         logger.info("total number of forecast request executions is " + forecastRequestsExecuted.incrementAndGet() );
         HourForecast hourForecast = objectMapper.readValue(response, HourForecast[].class)[0];
-        WeatherConditionTO weatherConditionTO = creareTO( hourForecast, city );
+        WeatherConditionTO weatherConditionTO = createTO( hourForecast, city );
         spoutOutputCollector.emit( new Values( weatherConditionTO ) );
         logger.info( String.format( "forecast condition from accuweather sent further with value: %s",
           weatherConditionTO.toString()));
@@ -60,13 +60,14 @@ public class AccuweatherFCGetterSpout extends BaseRichSpout implements StormCons
   }
 
   private String createURL( CitiesEnum citiesEnum ) {
-    return String.format( "http://" + ACCUWEATHER_HOST + "/forecasts/v1/hourly/1hour/%s?apikey=%s",
+    return String.format( "http://" + ACCUWEATHER_HOST + "/forecasts/v1/hourly/1hour/%s?apikey=%s&details=true",
         citiesEnum.getCityId(), ACCCUWEATHER_API_KEY );
   }
 
-  private WeatherConditionTO creareTO(HourForecast hourForecast, CitiesEnum city ) {
+  private WeatherConditionTO createTO(HourForecast hourForecast, CitiesEnum city ) {
     WeatherConditionTO weatherConditionTO = new WeatherConditionTO();
     weatherConditionTO.setTemperature( hourForecast.getTemperature().getValue().doubleValue() );
+    weatherConditionTO.setWindSpeed( hourForecast.getWind().getSpeed().getValue() );
     weatherConditionTO.setLocationKey( city.getCityId() );
     ZonedDateTime date = ZonedDateTime.parse( hourForecast.getDateTime() );
     weatherConditionTO.setTargetDate( date );

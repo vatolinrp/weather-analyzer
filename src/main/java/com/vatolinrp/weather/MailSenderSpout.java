@@ -136,7 +136,9 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     }
     Utils.sleep( MINUTE_SLEEP_TIME );
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
-      fileWriter.append( "Location, Date, Hour, Forecast(F), Real(F), Forecast(C), Real(C), Weather Service, Accuracy \n" );
+      fileWriter.append( "Location, Date, Hour, Temperature forecast(F), Temperature real(F), Temperature forecast(C)," +
+        " Temperature real(C), Wind speed forecast(mi/h), Wind speed real(mi/h), Wind speed forecast(km/h)," +
+        " Wind speed real(km/h), Weather service, Accuracy for temperature, Accuracy for wind speed, \n" );
       for( Object key: keys ) {
         if( reportCache.isKeyInCache( key ) ) {
           Element element = reportCache.get( key );
@@ -151,9 +153,9 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
       for( CitiesEnum cityEnumValue : CitiesEnum.values() ) {
         Map<Double, ApiEnum> accuracyMap = new HashMap<>();
         for( ApiEnum apiEnumValue : ApiEnum.values() ) {
-          String accuracyKey = "accuracy_counter:" + apiEnumValue.getCode() + "&" + cityEnumValue.getCityId();
-          if( accuracyCache.isKeyInCache( accuracyKey ) ) {
-            Element element = accuracyCache.get( accuracyKey );
+          String accuracyTemperatureKey = "accuracy_counter:" + apiEnumValue.getCode() + "&" + cityEnumValue.getCityId() + "&" + "temperature";
+          if( accuracyCache.isKeyInCache( accuracyTemperatureKey ) ) {
+            Element element = accuracyCache.get( accuracyTemperatureKey );
             if( element != null && element.getObjectValue() instanceof AccuracyResult ) {
               AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
               accuracyMap.put( accuracyResult.getAccuracyPercent(), apiEnumValue );
@@ -166,7 +168,27 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
             bestPercent = currentPercent;
           }
         }
-        fileWriter.append( cityEnumValue + "," + accuracyMap.get( bestPercent ).getName() + "\n" );
+        fileWriter.append( cityEnumValue + "," + accuracyMap.get( bestPercent ).getName() + "," + "for temperature" + "," + bestPercent + "\n" );
+      }
+      for( CitiesEnum cityEnumValue : CitiesEnum.values() ) {
+        Map<Double, ApiEnum> accuracyMap = new HashMap<>();
+        for( ApiEnum apiEnumValue : ApiEnum.values() ) {
+          String accuracyWindSpeedKey = "accuracy_counter:" + apiEnumValue.getCode() + "&" + cityEnumValue.getCityId() + "&" + "windSpeed";
+          if( accuracyCache.isKeyInCache( accuracyWindSpeedKey ) ) {
+            Element element = accuracyCache.get( accuracyWindSpeedKey );
+            if( element != null && element.getObjectValue() instanceof AccuracyResult ) {
+              AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
+              accuracyMap.put( accuracyResult.getAccuracyPercent(), apiEnumValue );
+            }
+          }
+        }
+        Double bestPercent = .0;
+        for( Double currentPercent : accuracyMap.keySet() ) {
+          if( currentPercent >= bestPercent ) {
+            bestPercent = currentPercent;
+          }
+        }
+        fileWriter.append( cityEnumValue + "," + accuracyMap.get( bestPercent ).getName() + "," + "for wind speed" + "," + bestPercent + "\n" );
       }
     }
     logger.info( "successfully created csv report file" );
@@ -189,10 +211,21 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     fileWriter.append( ',' );
     fileWriter.append( CalculationUtil.round( CalculationUtil.getCelsius( hourAccuracy.getActualTemperature() ) ).toString() );
     fileWriter.append( ',' );
+    fileWriter.append( hourAccuracy.getExpectedWindSpeed().toString() );
+    fileWriter.append( ',' );
+    fileWriter.append( hourAccuracy.getActualWindSpeed().toString() );
+    fileWriter.append( ',' );
+    fileWriter.append( CalculationUtil.round( CalculationUtil.getKms( hourAccuracy.getExpectedWindSpeed() ) ).toString() );
+    fileWriter.append( ',' );
+    fileWriter.append( CalculationUtil.round( CalculationUtil.getKms( hourAccuracy.getActualWindSpeed() ) ).toString() );
+    fileWriter.append( ',' );
     fileWriter.append( hourAccuracy.getApiType().getCode() );
     fileWriter.append( ',' );
     Double temperatureDiff = Math.abs( hourAccuracy.getExpectedTemperature() - hourAccuracy.getActualTemperature() );
     fileWriter.append( AccuracyEnum.getAccuracyByFahrenheitDiff( temperatureDiff ).toString() );
+    fileWriter.append( ',' );
+    Double windSpeedDiff = Math.abs( hourAccuracy.getExpectedWindSpeed() - hourAccuracy.getActualWindSpeed() );
+    fileWriter.append( AccuracyEnum.getAccuracyByMilesPerHourDiff( windSpeedDiff ).toString() );
     fileWriter.append("\n");
     fileWriter.flush();
   }

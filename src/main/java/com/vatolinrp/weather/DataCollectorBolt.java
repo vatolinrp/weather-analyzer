@@ -44,19 +44,30 @@ public class DataCollectorBolt extends BaseRichBolt implements StormConstants
       return;
     }
     Cache cache = cacheManager.getCache( REPORT_CACHE_NAME );
+    HourAccuracy hourAccuracy = createTO( currentCondition, forecastCondition );
+    String key = generateKey( hourAccuracy );
+    cache.put( new Element( key, hourAccuracy ) );
+    logger.info( String.format( "DataCollectorBolt populated cache with key : %s and value: %s",
+      key, hourAccuracy.toString() ) );
+    boltOutputCollector.emit( new Values( hourAccuracy ) );
+  }
+
+  private HourAccuracy createTO( WeatherConditionTO currentCondition, WeatherConditionTO forecastCondition ) {
     HourAccuracy hourAccuracy = new HourAccuracy();
     hourAccuracy.setDate( currentCondition.getTargetDate().toLocalDate() );
     hourAccuracy.setLocationKey( currentCondition.getLocationKey() );
     hourAccuracy.setActualTemperature( currentCondition.getTemperature() );
     hourAccuracy.setExpectedTemperature( forecastCondition.getTemperature() );
+    hourAccuracy.setActualWindSpeed( currentCondition.getWindSpeed() );
+    hourAccuracy.setExpectedWindSpeed( forecastCondition.getWindSpeed() );
     hourAccuracy.setHour( currentCondition.getTargetDate().getHour() );
     hourAccuracy.setApiType( currentCondition.getApiType() );
-    String key = hourAccuracy.getDate().toString() + "&" + hourAccuracy.getHour().toString()
+    return hourAccuracy;
+  }
+
+  private String generateKey( HourAccuracy hourAccuracy ) {
+    return hourAccuracy.getDate().toString() + "&" + hourAccuracy.getHour().toString()
       + "&" + hourAccuracy.getLocationKey() + "&" + hourAccuracy.getApiType();
-    cache.put( new Element( key, hourAccuracy ) );
-    logger.info( String.format( "DataCollectorBolt populated cache with key : %s and value: %s",
-      key, hourAccuracy.toString() ) );
-    boltOutputCollector.emit( new Values( hourAccuracy ) );
   }
 
   @Override

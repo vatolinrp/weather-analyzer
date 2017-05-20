@@ -7,7 +7,7 @@ public interface StormConstants {
   String DARK_SKY_API_TYPE = "DS";
   Long SLEEP_TIME = 3600000L;
   String DARK_SKY_API_KEY = "70038fb5200adc067f7bd899890ee0cf";
-  String ACCCUWEATHER_API_KEY = "nlodiXHXlW4DYOOnld3dAGbigT9A6hav";
+  String ACCCUWEATHER_API_KEY = "5oOkHKsarUaCv0ubc1WhmD4jiDBR7kHa";
   String DARK_SKY_HOST = "api.darksky.net";
   String ACCUWEATHER_HOST = "dataservice.accuweather.com";
   Long HOUR = 3600L;

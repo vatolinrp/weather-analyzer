@@ -12,4 +12,6 @@ public @Data class HourAccuracy implements Serializable {
   private String locationKey;
   private Double expectedTemperature;
   private Double actualTemperature;
+  private Double expectedWindSpeed;
+  private Double actualWindSpeed;
 }

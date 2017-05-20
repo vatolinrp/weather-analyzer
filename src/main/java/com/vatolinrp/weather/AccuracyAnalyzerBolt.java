@@ -44,9 +44,10 @@ public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
   @Override
   public void execute( Tuple tuple ) {
     HourAccuracy hourAccuracy = (HourAccuracy)tuple.getValueByField( "hourAccuracy" );
-    String key = "accuracy_counter:" + hourAccuracy.getApiType().getCode() + "&" + hourAccuracy.getLocationKey();
+    String temperatureKey = "accuracy_counter:" + hourAccuracy.getApiType().getCode() + "&" + hourAccuracy.getLocationKey() + "&" + "temperature";
+    String windSpeedKey = "accuracy_counter:" + hourAccuracy.getApiType().getCode() + "&" + hourAccuracy.getLocationKey() + "&" + "windSpeed";
     Cache cache = cacheManager.getCache( ACCURACY_COUNTERS_CACHE_NAME );
-    Element element = cache.get( key );
+    Element element = cache.get( temperatureKey );
     if( element.getObjectValue() instanceof AccuracyResult ) {
       AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
       Double temperatureDiff = Math.abs( hourAccuracy.getExpectedTemperature() - hourAccuracy.getActualTemperature() );
@@ -65,7 +66,28 @@ public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
         }
         default: {}
       }
-      cache.put( new Element( key, accuracyResult ) );
+      cache.put( new Element( temperatureKey, accuracyResult ) );
+    }
+    element = cache.get( windSpeedKey );
+    if( element.getObjectValue() instanceof AccuracyResult ) {
+      AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
+      Double windSpeedDiff = Math.abs( hourAccuracy.getExpectedWindSpeed() - hourAccuracy.getActualWindSpeed() );
+      switch ( AccuracyEnum.getAccuracyByMilesPerHourDiff( windSpeedDiff ) ) {
+        case ACCURATE_WIND_SPEED: {
+          accuracyResult.incrementAccurateCounter();
+          break;
+        }
+        case CLOSE_TO_ACCURATE_WIND_SPEED: {
+          accuracyResult.incrementCloseToAccurateCounter();
+          break;
+        }
+        case NOT_ACCURATE_WIND_SPEED: {
+          accuracyResult.incrementNotAccurateCounter();
+          break;
+        }
+        default: {}
+      }
+      cache.put( new Element( windSpeedKey, accuracyResult ) );
     }
 
 
