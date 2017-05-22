@@ -49,6 +49,10 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
   private CacheManager cacheManager;
   private MailAuthenticator mailAuthenticator;
   private static final Long MINUTE_SLEEP_TIME = 60000L;
+  private static final String GREETING_IMAGE_LOCATION = "src/main/resources/images/greeting_message.jpg";
+  private static final String REPORT_IMAGE_LOCATION = "src/main/resources/images/report_message.jpg";
+  private DataSource greetingImageResource;
+  private DataSource reportImageResource;
 
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
     mailProperties = new Properties();
@@ -58,17 +62,27 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     mailProperties.put( "mail.smtp.starttls.enable", "true" );
     mailAuthenticator = new MailAuthenticator();
     cacheManager = CacheManager.newInstance();
+    greetingImageResource = new FileDataSource( GREETING_IMAGE_LOCATION );
+    reportImageResource = new FileDataSource( REPORT_IMAGE_LOCATION );
     sendGreetingMessage();
   }
 
   private void sendGreetingMessage() {
     try {
       Session session = Session.getInstance( mailProperties, mailAuthenticator );
-      MimeMessage message = new MimeMessage( session );
+      Message message = new MimeMessage( session );
       message.setFrom( new InternetAddress( MAIL_FROM ) );
       message.addRecipient( Message.RecipientType.TO, new InternetAddress( MAIL_TO_ADDRESS ) );
       message.setSubject( "Greeting message" );
-      message.setText( "Hello, you have been chosen as a weather report consumer" );
+      MimeMultipart multipart = new MimeMultipart("related");
+      BodyPart messageBodyPart = new MimeBodyPart();
+      messageBodyPart.setContent("<img src=\"cid:image\">", "text/html");
+      multipart.addBodyPart( messageBodyPart );
+      messageBodyPart = new MimeBodyPart();
+      messageBodyPart.setDataHandler( new DataHandler( greetingImageResource ) );
+      messageBodyPart.setHeader("Content-ID", "<image>");
+      multipart.addBodyPart(messageBodyPart);
+      message.setContent(multipart);
       Transport.send( message );
       logger.info("Email has been successfully sent" );
     } catch ( MessagingException e ) {
@@ -109,15 +123,19 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     message.addRecipient( Message.RecipientType.TO, new InternetAddress( MAIL_TO_ADDRESS ) );
     message.setSubject( COMMON_MESSAGE_SUBJECT );
     BodyPart messageBodyPart = new MimeBodyPart();
-    messageBodyPart.setText( "Report mail" );
+    messageBodyPart.setContent("<img src=\"cid:image\">", "text/html");
     Multipart multipart = new MimeMultipart();
-    multipart.addBodyPart(messageBodyPart);
+    multipart.addBodyPart( messageBodyPart );
     messageBodyPart = new MimeBodyPart();
     String filename = new File( reportFileUrl.getFile() ).getAbsolutePath();
     DataSource source = new FileDataSource( filename );
     messageBodyPart.setDataHandler( new DataHandler( source ) );
     messageBodyPart.setFileName( REPORT_FILE_NAME );
-    multipart.addBodyPart(messageBodyPart);
+    multipart.addBodyPart( messageBodyPart );
+    messageBodyPart = new MimeBodyPart();
+    messageBodyPart.setDataHandler( new DataHandler( reportImageResource ) );
+    messageBodyPart.setHeader("Content-ID", "<image>");
+    multipart.addBodyPart( messageBodyPart );
     message.setContent( multipart );
     Transport.send( message );
     logger.info( "Email has been successfully sent" );
