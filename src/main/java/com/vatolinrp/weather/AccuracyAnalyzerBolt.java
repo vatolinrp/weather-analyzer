@@ -35,7 +35,9 @@ public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
     for( ApiEnum apiEnumValue : ApiEnum.values() ) {
       for( CitiesEnum citiesEnumValue : CitiesEnum.values() ) {
         AccuracyResult accuracyResult = new AccuracyResult( apiEnumValue, citiesEnumValue.getCityId() );
-        String key = "accuracy_counter:" + apiEnumValue.getCode() + "&" + citiesEnumValue.getCityId();
+        String key = "accuracy_counter:" + apiEnumValue.getCode() + "&" + citiesEnumValue.getCityId() + "&" + "temperature";
+        cache.put( new Element( key, accuracyResult ) );
+        key = "accuracy_counter:" + apiEnumValue.getCode() + "&" + citiesEnumValue.getCityId() + "&" + "windSpeed";
         cache.put( new Element( key, accuracyResult ) );
       }
     }
@@ -48,7 +50,7 @@ public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
     String windSpeedKey = "accuracy_counter:" + hourAccuracy.getApiType().getCode() + "&" + hourAccuracy.getLocationKey() + "&" + "windSpeed";
     Cache cache = cacheManager.getCache( ACCURACY_COUNTERS_CACHE_NAME );
     Element element = cache.get( temperatureKey );
-    if( element.getObjectValue() instanceof AccuracyResult ) {
+    if( element != null && element.getObjectValue() instanceof AccuracyResult ) {
       AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
       Double temperatureDiff = Math.abs( hourAccuracy.getExpectedTemperature() - hourAccuracy.getActualTemperature() );
       switch ( AccuracyEnum.getAccuracyByFahrenheitDiff( temperatureDiff ) ) {
@@ -69,7 +71,7 @@ public class AccuracyAnalyzerBolt extends BaseRichBolt implements StormConstants
       cache.put( new Element( temperatureKey, accuracyResult ) );
     }
     element = cache.get( windSpeedKey );
-    if( element.getObjectValue() instanceof AccuracyResult ) {
+    if( element != null && element.getObjectValue() instanceof AccuracyResult ) {
       AccuracyResult accuracyResult = (AccuracyResult)element.getObjectValue();
       Double windSpeedDiff = Math.abs( hourAccuracy.getExpectedWindSpeed() - hourAccuracy.getActualWindSpeed() );
       switch ( AccuracyEnum.getAccuracyByMilesPerHourDiff( windSpeedDiff ) ) {
