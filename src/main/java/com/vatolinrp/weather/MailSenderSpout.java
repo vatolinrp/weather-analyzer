@@ -152,7 +152,6 @@ public class MailSenderSpout extends BaseRichSpout implements StormConstants {
     if( keys.size() == numberOfReports ) {
       return false;
     }
-    Utils.sleep( MINUTE_SLEEP_TIME );
     try ( FileWriter fileWriter = new FileWriter( REPORT_FILE_LOCATION ) ) {
       fileWriter.append( "Location, Date, Hour, Temperature forecast(F), Temperature real(F), Temperature forecast(C)," +
         " Temperature real(C), Wind speed forecast(mi/h), Wind speed real(mi/h), Wind speed forecast(km/h)," +
